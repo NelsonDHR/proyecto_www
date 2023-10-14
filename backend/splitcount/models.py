@@ -43,6 +43,5 @@ class Participation(models.Model):
 class Payment(models.Model):
     participation = models.ForeignKey(Participation, on_delete=models.CASCADE)
     value = models.DecimalField(max_digits=10, decimal_places=2)
-    activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
