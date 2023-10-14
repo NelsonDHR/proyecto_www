@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     nickname = models.CharField(max_length=255)
-    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+    avatar = models.ImageField(upload_to='avatars/users/', null=True, blank=True)
 
 class Contact(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='user')
@@ -21,31 +21,37 @@ class Event(models.Model):
         ('FD', 'Comida'),
         ('OT', 'Otro'),
     )
+    event_type = models.CharField(max_length=2, choices=EVENT_TYPES)
+    creator = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    avatar = models.ImageField(upload_to='avatars/events/', null=True, blank=True)
     name = models.CharField(max_length=255)
     description = models.TextField()
-    event_type = models.CharField(max_length=2, choices=EVENT_TYPES)
-    avatar = models.ImageField(upload_to='event_avatars/', null=True, blank=True)
-    creator = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    participants = models.ManyToManyField(UserProfile, through='Participation_Event')
+    date = models.DateTimeField()
+    participants = models.ManyToManyField(UserProfile, blank=True, through='ParticipationEvent')
 
 class Activity(models.Model):
+    creator = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='created_activities')
     description = models.TextField()
     value = models.DecimalField(max_digits=10, decimal_places=2)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    participants = models.ManyToManyField(UserProfile, through='Participation_Activity')
-    creator = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='created_activities')
+    participants = models.ManyToManyField(UserProfile, through='ParticipationActivity')
 
-class Participation_Activity(models.Model):
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
-    percentage = models.DecimalField(max_digits=5, decimal_places=2)
-
-class Participation_Event(models.Model):
+class ParticipationEvent(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=False)
+
+class ParticipationActivity(models.Model):
+    PAYMENT_TYPES = (
+        ('PR', 'Porcentaje'),
+        ('VF', 'Valor fijo'),
+    )
+    payment_type = models.CharField(max_length=2, choices=PAYMENT_TYPES)
+    activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
+    value_type = models.DecimalField(max_digits=5, decimal_places=2)
+    is_paid = models.BooleanField(default=False)
 
 class Payment(models.Model):
-    participation = models.ForeignKey(Participation_Activity, on_delete=models.CASCADE)
+    participation_activity = models.ForeignKey(ParticipationActivity, on_delete=models.CASCADE)
     value = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateTimeField(auto_now_add=True)
-    is_active = models.BooleanField(default=True)

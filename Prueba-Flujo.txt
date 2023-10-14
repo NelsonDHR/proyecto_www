@@ -1,0 +1,86 @@
+Crear usuario 1:
+
+  nickname: xXMiguelXx
+  name: Miguelito
+  Apellido: Perez
+  Email: miguelito@perez.com
+  Password: 123456
+  Avatar: :=)
+
+
+Crear usuario 2:
+
+  nickname: xXJuanXx
+  name: Juan
+  Apellido: Perez
+  Email: juan@perez.com
+  Password: 1234 
+  Avatar: :()
+
+Usuario 1 busca usuario 2 por email:
+
+  email: juan@perez.com
+
+Lo encontró!
+
+Se genera un contacto:
+
+  user: ID de xXMiguelXx
+  contact: ID de xXJuanXx
+  is_active: True (Está en la lista de contactos)
+
+Usuario 1 crea un evento:
+
+  event_type: FD - Comida
+  name: Comida en casa de Miguel
+  description: Comida rápida en casa de Miguel
+  creator: ID de xXMiguelXx
+  participants: null
+  date: 2015-05-05 12:00:00
+  avatar: 3:)
+
+Se envía la solicitud a xXJuanXx para que participe y se crea un registro en Participation_Event con estado False (Pendiente)
+
+Registro Participation_Event:
+
+  event: ID del evento
+  user: ID de xXJuanXx
+  is_active: False (Pendiente)
+
+Usuario 2 acepta la solicitud (se modifica la instancia de Participation_Event, y los participantes del evento):
+
+  Participation_Event.is_active: True
+  Participation_Event.event.particcipants: ID de xXJuanXx
+
+Usuario 2 crea una actividad (se crea un registro en Activity):
+
+  description: Comprar pan
+  event: ID del evento
+  creator: ID de xXJuanXx
+  value (total de la actividad): 1000
+  participants: null
+
+Se crea la actividad Comprar pan, asociada al evento Comer en casa de Miguel, con un valor de 1000, y el creador es xXJuanXx, todavía no tiene participantes
+
+Usuario 2 añade a usuario 1 a la actividad (se crea un registro de Participation_Activity y se modifica Activity)
+
+Se crea la instancia de Participation_Activy, y se modifican los participantes de la actividad
+
+  activity: ID de la actividad
+  user: ID de xXMiguelXx
+  payment_type: Porcentaje
+  value: 0.5
+  is_paid: False
+  Participation_Activity.activity.participants: ID de xXMiguelXx
+
+Usuario 1 realiza el pago de la actividad (se crea un registro en Payment y se modifica el atributo is_paid en Participation_Activity)
+
+Registro de Payment:
+
+  participation_activity: ID de Participation_Activity
+  value: 500
+  date: 2015-05-05 12:00:00
+  Participation_Activity.is_paid: True
+
+
+
