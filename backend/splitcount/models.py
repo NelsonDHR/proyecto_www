@@ -26,22 +26,26 @@ class Event(models.Model):
     event_type = models.CharField(max_length=2, choices=EVENT_TYPES)
     avatar = models.ImageField(upload_to='event_avatars/', null=True, blank=True)
     creator = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    participants = models.ManyToManyField(UserProfile, related_name='events')
+    participants = models.ManyToManyField(UserProfile, through='Participation_Event')
 
 class Activity(models.Model):
     description = models.TextField()
     value = models.DecimalField(max_digits=10, decimal_places=2)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    participants = models.ManyToManyField(UserProfile, through='Participation')
+    participants = models.ManyToManyField(UserProfile, through='Participation_Activity')
     creator = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='created_activities')
 
-class Participation(models.Model):
+class Participation_Activity(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
     percentage = models.DecimalField(max_digits=5, decimal_places=2)
 
+class Participation_Event(models.Model):
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+
 class Payment(models.Model):
-    participation = models.ForeignKey(Participation, on_delete=models.CASCADE)
+    participation = models.ForeignKey(Participation_Activity, on_delete=models.CASCADE)
     value = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
