@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -9,47 +9,53 @@ import {
   Button,
   Text,
   Box,
+  Flex,
 } from "@chakra-ui/react";
 import Header from "../../components/Header";
 import Modal_Basic from "../../components/Modal";
-import DynamicForm from "../../components/ActivityForm";
+///import DynamicForm from "../../components/ActivityForm";
+import FormActivity from "./FormActivities";
+import { getAllActivities } from "../../api/activity.api";
 
 const Activities = () => {
-  const form = (
-    <DynamicForm
-      numberOfInputs={7}
-      placeholder={[
-        "Creador actividad",
-        "Avatar actividad",
-        "Nombre de la actividad",
-        "Descripción de la actividad",
-        "Valor actividad",
-        "Evento al que pertenece la actividad",
-        "Participantes de la actividad",
-      ]}
-    ></DynamicForm>
-  );
+  const [activity, setActivity] = useState([]);
+  const form = <FormActivity ></FormActivity>;
+
+  useEffect(() => {
+    async function loadActivity() {
+      const res = await getAllActivities();
+      setActivity(res.data);
+    }
+    loadActivity();
+  }, []);
+
+  const updateActivity = (newActivity) => {
+    setActivity([...activity, newActivity]);
+  };
+
   return (
     <>
       <Header text="Actividades del evento..."></Header>
       <SimpleGrid
-        spacing={4}
-        templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
+        spacing={5}
+        columns={{ base: 1, sm: 2, md: 3, lg: 5 }}
+        justifyContent="center"
       >
-        <Card>
-          <CardHeader>
-            <Heading size="md"> Customer dashboard</Heading>
-          </CardHeader>
-          <CardBody>
-            <Text>
-              View a summary of all your customers over the last month.
-            </Text>
-          </CardBody>
-          <CardFooter>
-            <Button>View here</Button>
-          </CardFooter>
-        </Card>
+        {activity.map((activity) => (
+          <Card key={activity.id}>
+            <CardHeader>
+              <Heading size="md">{activity.name}</Heading>
+            </CardHeader>
+            <CardBody>
+              <Text>{activity.description}</Text>
+            </CardBody>
+            <CardFooter>
+              <Button>Ver detalles</Button>
+            </CardFooter>
+          </Card>
+        ))}
       </SimpleGrid>
+
       <Modal_Basic
         title="Creación de Actividad"
         componente={form}
