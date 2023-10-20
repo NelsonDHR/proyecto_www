@@ -1,11 +1,55 @@
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.hashers import make_password, check_password
 from django.db import models
-from django.contrib.auth.models import User
+from django.utils import timezone
 
-class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    nickname = models.CharField(max_length=255)
+class UserManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError('The Email field must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        return self.create_user(email, password, **extra_fields)
+
+class User(models.Model):
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=255)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+    nickname = models.CharField(max_length=30)
+    is_active = models.BooleanField(default=True)
     avatar = models.ImageField(upload_to='avatars/users/', null=True, blank=True)
-    contacts = models.ManyToManyField('self', symmetrical=False)
+    avatar_name = models.CharField(max_length=255, null=True, blank=True)
+    contacts = models.ManyToManyField('self', symmetrical=False, blank=True)
+    last_login = models.DateTimeField(default=timezone.now)
+
+    objects = UserManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'nickname']
+
+    def set_password(self, raw_password):
+        self.password = make_password(raw_password)
+
+    def check_password(self, raw_password):
+        return check_password(raw_password, self.password)
+
+    def has_perm(self, perm, obj=None):
+        return True
+
+    def has_module_perms(self, app_label):
+        return True
+
+    @property
+    def is_staff(self):
+        return self.is_superuser
 
 class Event(models.Model):
     EVENT_TYPES = (
@@ -16,26 +60,26 @@ class Event(models.Model):
         ('OT', 'Otro'),
     )
     event_type = models.CharField(max_length=2, choices=EVENT_TYPES)
-    creator = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='created_events')
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_events')
     avatar = models.ImageField(upload_to='avatars/events/', null=True, blank=True)
     name = models.CharField(max_length=255)
     description = models.TextField()
     date = models.DateTimeField()
-    participants = models.ManyToManyField(UserProfile, blank=True, through='ParticipationEvent', related_name='events')
+    participants = models.ManyToManyField(User, blank=True, through='ParticipationEvent', related_name='events')
     is_active = models.BooleanField(default=True)
 
 class Activity(models.Model):
-    creator = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='created_activities')
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_activities')
     avatar = models.ImageField(upload_to='avatars/activities/', null=True, blank=True)
     name = models.CharField(max_length=255)
     description = models.TextField()
     value = models.DecimalField(max_digits=10, decimal_places=2)
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='activities')
-    participants = models.ManyToManyField(UserProfile, through='ParticipationActivity', related_name='activities')
+    participants = models.ManyToManyField(User, through='ParticipationActivity', related_name='activities')
     is_active = models.BooleanField(default=True)
 
 class ParticipationEvent(models.Model):
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='participation_events')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='participation_events')
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='participations')
     is_active = models.BooleanField(default=False)
 
@@ -46,7 +90,7 @@ class ParticipationActivity(models.Model):
     )
     payment_type = models.CharField(max_length=2, choices=PAYMENT_TYPES)
     activity = models.ForeignKey(Activity, on_delete=models.CASCADE, related_name='participations')
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='participaton_activities')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='participaton_activities')
     value_type = models.DecimalField(max_digits=5, decimal_places=2)
     is_paid = models.BooleanField(default=False)
 
