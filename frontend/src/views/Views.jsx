@@ -18,13 +18,13 @@ const Views = () => {
       <Route path="/" element={<LogIn />} />
       <Route path="/log-in" element={<LogIn />} />
       <Route path="/sign-up" element={<SignUp />} />
-      {isAuthenticated ? (
+      {/* {isAuthenticated ? (
         <>
           <Route path="/home" element={<Home />} />
         </>
       ) : (
         navigateTo('/log-in')
-      )}
+      )} */}
       <Route path="/events" element={<Events />} />
       <Route path="/activities" element={<Activities />} />
     </Routes>
