@@ -3,6 +3,7 @@ import LogIn from "./Auth/LogIn";
 import SignUp from "./Auth/SignUp";
 import Home from "./Home";
 import Events from "./Events/Events";
+import Activities from "./Activities/Activities";
 
 const Views = () => {
   return (
@@ -12,6 +13,7 @@ const Views = () => {
       <Route path="/log-in" element={<LogIn />} />
       <Route path="/sign-up" element={<SignUp />} />
       <Route path="/events" element={<Events />} />
+      <Route path="/activities" element={<Activities />} />
     </Routes>
   );
 };
