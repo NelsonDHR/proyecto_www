@@ -1,9 +1,9 @@
 from django.contrib import admin
-from .models import UserProfile, Event, Activity, ParticipationEvent, ParticipationActivity, Payment
+from .models import User, Event, Activity, ParticipationEvent, ParticipationActivity, Payment
 
 # Register your models here.
 
-admin.site.register(UserProfile)
+admin.site.register(User)
 admin.site.register(Event)
 admin.site.register(Activity)
 admin.site.register(ParticipationEvent)
