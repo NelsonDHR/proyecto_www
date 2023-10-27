@@ -12,6 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         password = validated_data.pop('password')
+        validated_data['username'] = validated_data['email']
         hashed_password = make_password(password)
         user = User.objects.create(password=hashed_password, **validated_data)
         return user

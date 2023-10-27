@@ -16,9 +16,9 @@ import {
   Text
 } from "@chakra-ui/react";
 import { createEvent } from '../../api/event.api';
-import { AddIcon, CalendarIcon } from '@chakra-ui/icons';
+import { AddIcon, PlusSquareIcon } from '@chakra-ui/icons';
 
-const AddEventModal = ({ updateEvents, ...props }) => {
+const AddContactModal = ({ updateEvents, ...props }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [eventData, setEventData] = useState({
     event_type: "",
@@ -77,10 +77,10 @@ const AddEventModal = ({ updateEvents, ...props }) => {
         _focus={{
           boxShadow: "none",
         }}
-        width={isHovered ? "150px" : "40px"}
+        width={isHovered ? "160px" : "40px"}
       >
-        {isHovered ? <CalendarIcon /> : <AddIcon />}
-        {isHovered && <Text ml={2} fontSize={17.5}>Add Event</Text>}
+        {isHovered ? <PlusSquareIcon /> : <AddIcon />}
+        {isHovered && <Text ml={2} fontSize={17.5}>Add Contact</Text>}
       </Button>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
@@ -136,4 +136,4 @@ const AddEventModal = ({ updateEvents, ...props }) => {
   );
 };
 
-export default AddEventModal;
+export default AddContactModal;

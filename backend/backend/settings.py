@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "rest_framework.authtoken",
     "splitcount",
     "corsheaders"
 ]
@@ -132,6 +133,4 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
 ]
 
-AUTHENTICATION_BACKENDS = [
-    'splitcount.backends.CustomAuthBackend',
-]
+AUTH_USER_MODEL = 'splitcount.User'
