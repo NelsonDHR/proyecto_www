@@ -11,7 +11,7 @@ class User(AbstractUser):
     avatar = models.ImageField(upload_to='avatars/users/', null=True, blank=True)
     avatar_name = models.CharField(max_length=255, null=True, blank=True)
     contacts = models.ManyToManyField('self', symmetrical=False, blank=True)
-    
+
     def __str__(self):
         return self.nickname
 
