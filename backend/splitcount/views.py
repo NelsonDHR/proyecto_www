@@ -7,7 +7,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 
 from splitcount.models import User
-from splitcount.backends import CustomAuthBackend
+from splitcount.backends import CustomUserModelBackend
 from .models import *
 from .serializers import *
 

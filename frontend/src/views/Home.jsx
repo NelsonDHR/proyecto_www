@@ -1,13 +1,34 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import {
+  Box,
+  useColorMode,
+} from '@chakra-ui/react';
+import { useState } from 'react';
+import Navbar from '../components/Navbar';
+import Events from './Events/Events';
+import Contatcs from './Contacts/Contacts';
 
 const Home = () => {
+  const { colorMode } = useColorMode();
+
+  const [selectedOption, setSelectedOption] = useState('events');
+
+  const handleOptionClick = (option) => {
+    setSelectedOption(option);
+  };
+
   return (
-    <div>
-      <h1>Welcome to My Web App</h1>
-      <p>This is the home page of my web app.</p>
-      <Link to="/about">Learn more about us</Link>
-    </div>
+    <Box
+      w="100vw"
+      h="100vh"
+      display="flex"
+      flexDirection="column"
+      overflow="hidden"
+      bg={colorMode === 'light' ? 'gray.200' : 'gray.800'}
+    >
+      <Navbar selectedOption={selectedOption} handleOptionClick={handleOptionClick} />
+      {selectedOption === 'events' ? <Events /> : <Contatcs />}
+    </Box>
   );
 };
 
