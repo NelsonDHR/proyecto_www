@@ -4,6 +4,7 @@ import SignUp from "./Auth/SignUp";
 import Home from "./Home";
 import Events from "./Events/Events";
 import Activities from "./Activities/Activities";
+import Profile from "./Profile/Profile";
 
 const Views = () => {
 
@@ -20,6 +21,7 @@ const Views = () => {
       <Route path="/home" element={<PrivateRoute> <Home /> </PrivateRoute>} />
       <Route path="/events" element={<PrivateRoute> <Events /> </PrivateRoute>} />
       <Route path="/activities" element={<PrivateRoute> <Activities /> </PrivateRoute>} />
+      <Route path="/profile" element={<PrivateRoute> <Profile /> </PrivateRoute>} />
     </Routes>
   );
 };
