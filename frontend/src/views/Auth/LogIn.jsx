@@ -14,7 +14,6 @@ import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import ToggleColorMode from '../../components/ToggleColorMode';
 
 const LogInSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Required'),
@@ -29,12 +28,12 @@ const LogIn = () => {
   const handleSubmit = async (values, actions) => {
     try {
       const formData = new FormData();
-      formData.append('username', values.email);
+      formData.append('email', values.email);
       formData.append('password', values.password);
 
       const response = await axios.post('http://localhost:8000/splitcount/log-in/', formData);
       localStorage.setItem('token', response.data.token);
-      navigateTo('/home');
+      navigateTo('/');
     } catch (error) {
       setError(error.response.data.error);
     } finally {
@@ -51,7 +50,6 @@ const LogIn = () => {
       alignItems="center"
       bg={colorMode == 'light' ? 'gray.100' : 'gray.900'}
     >
-      <ToggleColorMode position="absolute" />
       <Box
         w="400px"
         h="400px"

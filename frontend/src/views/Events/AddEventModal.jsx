@@ -12,18 +12,10 @@ import {
   FormControl,
   FormLabel,
   Input,
-  Select,
-  Text
+  Select, // Importa el componente Select
 } from "@chakra-ui/react";
- import { createEvent } from '../../api/event.api';
-import { AddIcon, CalendarIcon } from '@chakra-ui/icons';
-/* import { jwtDecode } from "jwt-decode";
-
-
-
-const token = localStorage.getItem('token')
-const decodedToken = jwtDecode(token);
-const userId = decodedToken ? decodedToken.userId : null;  */
+import { createEvent } from '../../api/event.api';
+import { AddIcon } from '@chakra-ui/icons';
 
 const AddEventModal = ({ updateEvents, ...props }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -60,34 +52,18 @@ const AddEventModal = ({ updateEvents, ...props }) => {
     }
   };
 
-  const [isHovered, setIsHovered] = useState(false);
-
   return (
     <>
-      <Button
-        position="absolute"
-        bottom="2rem"
-        right="2rem"
-        colorScheme="teal"
-        size="lg"
-        borderRadius="full"
-        p={6}
-        onClick={onOpen}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        _hover={{
-          bg: "teal.400",
-          color: "white",
-          transform: "scale(1.1)",
-          transition: "all 0.2s ease-in-out",
-        }}
-        _focus={{
-          boxShadow: "none",
-        }}
-        width={isHovered ? "150px" : "40px"}
-      >
-        {isHovered ? <CalendarIcon /> : <AddIcon />}
-        {isHovered && <Text ml={2} fontSize={17.5}>Add Event</Text>}
+      <Button 
+      position="absolute"
+      bottom="2rem"
+      right="2rem"
+      colorScheme="teal"
+      size="lg"
+      borderRadius="full"
+      p={6}
+      onClick={onOpen}>
+        <AddIcon />
       </Button>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
