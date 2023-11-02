@@ -30,6 +30,7 @@ import woman3 from '../../assets/avatars/woman-3.png';
 import bear from '../../assets/avatars/bear.png';
 import cat from '../../assets/avatars/cat.png';
 import panda from '../../assets/avatars/panda.png';
+import ToggleColorMode from '../../components/ToggleColorMode';
 
 const SignUpSchema = Yup.object().shape({
   firstName: Yup.string().required('Required'),
@@ -112,6 +113,7 @@ const SignUp = () => {
       alignItems="center"
       bg={colorMode === 'light' ? 'gray.100' : 'gray.800'}
     >
+      <ToggleColorMode position="absolute" />
       {isLoading ? (
         <Box
           display="flex"

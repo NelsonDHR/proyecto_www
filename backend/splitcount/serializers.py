@@ -12,9 +12,16 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         password = validated_data.pop('password')
+        validated_data['username'] = validated_data['email']
         hashed_password = make_password(password)
         user = User.objects.create(password=hashed_password, **validated_data)
         return user
+
+class LogInSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['email', 'password']
+
 
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
