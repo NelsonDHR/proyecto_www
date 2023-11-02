@@ -1,25 +1,14 @@
-import React, { useEffect, useState } from "react";
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  SimpleGrid,
-  Heading,
-  Button,
-  Text,
-  Box,
-  Flex,
-} from "@chakra-ui/react";
-import Header from "../../components/Header";
-import Modal_Basic from "../../components/Modal";
-///import DynamicForm from "../../components/ActivityForm";
-import FormActivity from "./FormActivities";
-import { getAllActivities } from "../../api/activity.api";
+import React, { useEffect, useState } from 'react';
+import { Card, CardHeader, CardBody, CardFooter, SimpleGrid, Heading, Button, Text, Flex } from '@chakra-ui/react';
+import { AddIcon } from '@chakra-ui/icons';
+import { getAllActivities } from '../../api/activity.api';
+import { useDisclosure } from "@chakra-ui/hooks";
+import AddActivityModal from './AddActivityModal';
+import UpdateActivityModal from './UpdateActivityModal';
 
-const Activities = () => {
+const Activity = () => {
   const [activity, setActivity] = useState([]);
-  const form = <FormActivity ></FormActivity>;
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
     async function loadActivity() {
@@ -33,35 +22,33 @@ const Activities = () => {
     setActivity([...activity, newActivity]);
   };
 
+  const refreshActivity = (newActivity, index) => {
+    const updateActivity = [...activity]
+    updateActivity[index] = newActivity
+    setActivity(updateActivity)
+  };
+  //console.log(activity)
+
   return (
-    <>
-      <Header text="Actividades del evento..."></Header>
-      <SimpleGrid
-        spacing={5}
-        columns={{ base: 1, sm: 2, md: 3, lg: 5 }}
-        justifyContent="center"
-      >
-        {activity.map((activity) => (
+    <Flex alignItems="center" justifyContent="center" height="100vh" position="relative">
+      <SimpleGrid spacing={4} columns={{ base: 1, sm: 2, md: 3, lg: 5 }}>
+        {activity.map((activity, index) => (
           <Card key={activity.id}>
             <CardHeader>
-              <Heading size="md">{activity.name}</Heading>
+              <Heading size='md'>{activity.name}</Heading>
             </CardHeader>
             <CardBody>
               <Text>{activity.description}</Text>
             </CardBody>
             <CardFooter>
-              <Button>Ver detalles</Button>
+              <UpdateActivityModal isOpen={isOpen} onClose={onClose} refreshActivity={refreshActivity} activity = {activity} index={index}/>
             </CardFooter>
           </Card>
         ))}
       </SimpleGrid>
-
-      <Modal_Basic
-        title="Creación de Actividad"
-        componente={form}
-      ></Modal_Basic>
-    </>
+      <AddActivityModal isOpen={isOpen} onClose={onClose} updateActivity={updateActivity} />
+    </Flex>
   );
 };
 
-export default Activities;
+export default Activity;
