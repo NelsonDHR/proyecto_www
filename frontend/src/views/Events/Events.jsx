@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardHeader, CardBody, CardFooter, SimpleGrid, Heading, Button, Text, Flex } from '@chakra-ui/react';
+import { Card, CardHeader, CardBody, CardFooter, SimpleGrid, Heading, Button, Text, Flex, Stack,Center } from '@chakra-ui/react';
 import { AddIcon } from '@chakra-ui/icons';
 import { getAllEvents } from '../../api/event.api';
 import { useDisclosure } from "@chakra-ui/hooks";
 import AddEventModal from './AddEventModal';
+import UpdateEventModal from './UpdateEventModal';
 
 const Events = () => {
   const [events, setEvents] = useState([]);
@@ -21,20 +22,35 @@ const Events = () => {
     setEvents([...events, newEvent]);
   };
 
+  const refreshEvents = (newEvent, index) => {
+    const updateEvent = [...events]
+    updateEvent[index] = newEvent
+    setEvents(updateEvent)
+  };
+
   return (
     <Flex alignItems="center" justifyContent="center" height="100vh" position="relative">
       <SimpleGrid spacing={4} columns={{ base: 1, sm: 2, md: 3, lg: 5 }}>
-        {events.map((event) => (
+        {events.map((event,index) => (
           <Card key={event.id}>
-            <CardHeader>
-              <Heading size='md'>{event.name}</Heading>
-            </CardHeader>
+            <Center>
+              <CardHeader>
+                <Heading size='md'>{event.name}</Heading>
+              </CardHeader>
+            </Center>
             <CardBody>
               <Text>{event.description}</Text>
             </CardBody>
-            <CardFooter>
-              <Button>Ver actividades</Button>
-            </CardFooter>
+            <Center>
+              <CardFooter>
+                <Stack direction="column" spacing={2}>
+                  <Button size="md">
+                    Ver actividades
+                  </Button>
+                  <UpdateEventModal isOpen={isOpen} onClose={onClose} refreshEvents={refreshEvents} event={event} index={index} />
+                </Stack>
+              </CardFooter>
+            </Center>
           </Card>
         ))}
       </SimpleGrid>

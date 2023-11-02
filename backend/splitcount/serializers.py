@@ -17,6 +17,12 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.create(password=hashed_password, **validated_data)
         return user
 
+class LogInSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['email', 'password']
+
+
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
