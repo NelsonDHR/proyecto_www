@@ -16,6 +16,7 @@ class SignUpView(generics.CreateAPIView):
 
 class LogInView(ObtainAuthToken):
     authentication_classes = []
+    permission_classes = [AllowAny]
 
 
 class LogOutView(APIView):

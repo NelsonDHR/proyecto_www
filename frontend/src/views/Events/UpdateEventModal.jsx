@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { useDisclosure } from "@chakra-ui/hooks";
 import {
   Modal,
@@ -13,28 +13,21 @@ import {
   FormLabel,
   Input,
   Select,
-  Text
+  Text,
 } from "@chakra-ui/react";
- import { createEvent } from '../../api/event.api';
-import { AddIcon, CalendarIcon } from '@chakra-ui/icons';
-/* import { jwtDecode } from "jwt-decode";
+import { AddIcon, CalendarIcon } from "@chakra-ui/icons";
+import { putEvent } from "../../api/event.api";
 
-
-
-const token = localStorage.getItem('token')
-const decodedToken = jwtDecode(token);
-const userId = decodedToken ? decodedToken.userId : null;  */
-
-const AddEventModal = ({ updateEvents, ...props }) => {
+const UpdateEventModal = ({ refreshEvents, event,  ...props }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [eventData, setEventData] = useState({
-    event_type: "",
+    event_type: event.event_type,
     avatar: null,
-    name: "",
-    description: "",
+    name: event.name,
+    description: event.description,
     is_active: true,
-    creator: 1,
-    participants: []
+    creator: event.creator,
+    participants: event.participants
   });
 
   const handleChange = (e) => {
@@ -43,19 +36,19 @@ const AddEventModal = ({ updateEvents, ...props }) => {
       ...eventData,
       [name]: value,
     });
-    console.log(eventData)
+    console.log(eventData);
   };
 
   const handleSubmit = async () => {
     try {
-      // Llama a la función de la API para crear el evento
-      const newEvent = await createEvent(eventData);
-      // Actualiza la lista de eventos en el componente padre
-      updateEvents(newEvent.data);
-      // Cierra el modal después de que se haya enviado el evento
+      // Llama a la función de la API para crear el event
+      const newEvent = await putEvent(event.id, eventData);
+      // Actualiza la lista de activities en el componente padre
+      refreshEvents(newEvent.data, props.index);
+      // Cierra el modal después de que se haya enviado el Event
       onClose();
     } catch (error) {
-      console.error("Error al crear el evento:", error);
+      console.error("Error al crear la actividad:", error);
       // Aquí puedes manejar el error, mostrar un mensaje al usuario, etc.
     }
   };
@@ -64,35 +57,11 @@ const AddEventModal = ({ updateEvents, ...props }) => {
 
   return (
     <>
-      <Button
-        position="absolute"
-        bottom="2rem"
-        right="2rem"
-        colorScheme="teal"
-        size="lg"
-        borderRadius="full"
-        p={6}
-        onClick={onOpen}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        _hover={{
-          bg: "teal.400",
-          color: "white",
-          transform: "scale(1.1)",
-          transition: "all 0.2s ease-in-out",
-        }}
-        _focus={{
-          boxShadow: "none",
-        }}
-        width={isHovered ? "150px" : "40px"}
-      >
-        {isHovered ? <CalendarIcon /> : <AddIcon />}
-        {isHovered && <Text ml={2} fontSize={17.5}>Add Event</Text>}
-      </Button>
+      <Button onClick={onOpen}>Editar evento</Button>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Crear Evento</ModalHeader>
+          <ModalHeader>Editar Evento</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <FormControl>
@@ -128,13 +97,22 @@ const AddEventModal = ({ updateEvents, ...props }) => {
                 <option value="OT">Otro</option>
               </Select>
             </FormControl>
+{/*             <FormControl>
+              <FormLabel>Participante actividad</FormLabel>
+              <Input
+                type="number"
+                name="participants"
+                value={activityData.participants}
+                onChange={handleChange}
+              />
+            </FormControl> */}
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={onClose}>
               Cancelar
             </Button>
             <Button colorScheme="green" onClick={handleSubmit}>
-              Crear
+              Actualizar
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -143,4 +121,4 @@ const AddEventModal = ({ updateEvents, ...props }) => {
   );
 };
 
-export default AddEventModal;
+export default UpdateEventModal;
