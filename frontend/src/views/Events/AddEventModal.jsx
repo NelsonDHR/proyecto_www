@@ -17,13 +17,13 @@ import {
 } from "@chakra-ui/react";
  import { createEvent } from '../../api/event.api';
 import { AddIcon, CalendarIcon } from '@chakra-ui/icons';
+/* import { jwtDecode } from "jwt-decode";
 
-//No funcionó
-/*import jwt from 'jsonwebtoken';
+
 
 const token = localStorage.getItem('token')
-const decodedToken = jwt.decode(token);
-const userId = decodedToken ? decodedToken.userId : null; */
+const decodedToken = jwtDecode(token);
+const userId = decodedToken ? decodedToken.userId : null;  */
 
 const AddEventModal = ({ updateEvents, ...props }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
