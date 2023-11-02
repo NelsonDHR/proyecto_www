@@ -1,44 +1,45 @@
-from django.contrib.auth.hashers import check_password
-from rest_framework import status, viewsets
-from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework import status, viewsets, generics
+from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
-
-from splitcount.models import User
-from splitcount.backends import CustomUserModelBackend
+from rest_framework.permissions import AllowAny
 from .models import *
 from .serializers import *
 
 
-@api_view(['POST'])
-def sign_up(request):
-    serializer = UserSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class SignUpView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    permission_classes = [AllowAny]
+    authentication_classes = []
+    serializer_class = UserSerializer
 
 
-@api_view(['POST'])
-def log_in(request):
-    email = request.data.get('email')
-    password = request.data.get('password')
-    try:
-        user = User.objects.get(email=email)
-    except User.DoesNotExist:
-        return Response({'error': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
-    if check_password(password, user.password):
-        token, created = Token.objects.get_or_create(user=user)
-        return Response({'token': token.key})
-    else:
-        return Response({'error': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
+class LogInView(ObtainAuthToken):
+    authentication_classes = []
 
+
+class LogOutView(APIView):
+    def get(self, request, format=None):
+        request.user.auth_token.delete()
+        return Response(status=status.HTTP_200_OK)
+    
 
 class EventView(viewsets.ModelViewSet):
     serializer_class = EventSerializer
     queryset = Event.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        
+        # Get current user
+        request_data = request.data.copy()
+        request_data["creator"] = request.user.id
+        # Get current user
+        
+        serializer = self.get_serializer(data=request_data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class Activity_view(viewsets.ModelViewSet):
