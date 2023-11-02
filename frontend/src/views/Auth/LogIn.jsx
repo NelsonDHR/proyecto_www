@@ -29,7 +29,7 @@ const LogIn = () => {
   const handleSubmit = async (values, actions) => {
     try {
       const formData = new FormData();
-      formData.append('email', values.email);
+      formData.append('username', values.email);
       formData.append('password', values.password);
 
       const response = await axios.post('http://localhost:8000/splitcount/log-in/', formData);
