@@ -17,11 +17,16 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.create(password=hashed_password, **validated_data)
         return user
 
+
 class LogInSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['email', 'password']
 
+
+class ContactSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    
 
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
@@ -37,4 +42,4 @@ class EventSerializer(serializers.ModelSerializer):
 class Activity_serializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
-        fields = '__all__'
+        fields = '__all__'  

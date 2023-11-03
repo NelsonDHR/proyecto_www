@@ -21,7 +21,7 @@ const Navbar = ({ selectedOption, handleOptionClick }) => {
       px={4}
       py={4}
       height="70px"
-      position="fixed"
+      position="sticky"
       top={0}
       left={0}
       right={0}

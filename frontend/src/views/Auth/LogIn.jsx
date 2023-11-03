@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -24,7 +24,22 @@ const LogInSchema = Yup.object().shape({
 const LogIn = () => {
   const { colorMode } = useColorMode();
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState('');
   const navigateTo = useNavigate();
+
+  useEffect(() => {
+    let timeoutId;
+    if (isLoading) {
+      setMessage('Logging in...');
+      timeoutId = setTimeout(() => {
+        navigateTo('/home');
+      }, 3000);
+    }
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [isLoading, navigateTo]);
 
   const handleSubmit = async (values, actions) => {
     try {
