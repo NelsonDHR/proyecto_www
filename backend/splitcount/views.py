@@ -73,3 +73,20 @@ class EventView(viewsets.ModelViewSet):
 class Activity_view(viewsets.ModelViewSet):
     serializer_class = Activity_serializer
     queryset = Activity.objects.all()
+    
+class UserDetailView(generics.RetrieveAPIView):
+    serializer_class=UserSerializer
+    permission_classes=[IsAuthenticated]
+    
+    def get_object(self):
+        return self.request.user
+    def put(self, request, *args, **kwargs):
+        # Obtiene el objeto de usuario que se está actualizando
+        user = self.get_object()
+
+        # Actualiza los datos del usuario con los datos de la solicitud
+        serializer = self.get_serializer(user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data)
