@@ -9,24 +9,34 @@ import {
   Heading,
   Flex,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
 import Events from "../Events/Events";
 import Contatcs from "../Contacts/Contacts";
+import { getUser, updateUser } from "../../api/profile.api";
 
 const Profile = () => {
   const { colorMode } = useColorMode();
-  const defaultData = {
-    email: "email mockup",
-    first_name: "firstName mockup",
-    second_name: "secondName mockup",
-    password: "password mockup",
-    nickname: "nickname mockup",
-  };
 
   const [selectedOption, setSelectedOption] = useState("profile");
   const [isEditable, setIsEditable] = useState(false);
+  const [defaultData, setDefaultData] = useState({
+    email: "",
+    first_name: "",
+    last_name: "",
+    nickname: "",
+    //password: "password mockup",
+  });
   const [dataUser, setDataUser] = useState(defaultData);
+
+  useEffect(() => {
+    async function loadUser() {
+      const res = await getUser();
+      setDataUser(res.data);
+      setDefaultData(res.data);
+    }
+    loadUser();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,14 +55,19 @@ const Profile = () => {
     setIsEditable(true);
   };
 
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     //Enviar actualización a la bd, uso de API.
-    setIsEditable(false)
-  }
+    setIsEditable(false);
+    try {
+      const newUpdateUser = await updateUser(dataUser);
+    } catch (error) {
+      console.error("Error al actualizar usuario:", error);
+    }
+  };
 
   const handleCancel = () => {
     setIsEditable(false);
-    setDataUser(defaultData)
+    setDataUser(defaultData);
   };
 
   return (
@@ -94,13 +109,13 @@ const Profile = () => {
         </Box>
         <Box w="80%" maxW="400px">
           <FormControl>
-            <FormLabel>Second name</FormLabel>
+            <FormLabel>Last name</FormLabel>
             <Input
               bg={colorMode === "light" ? "white" : "gray.700"}
               color={colorMode === "light" ? "gray.800" : "white"}
               type="text"
-              name="second_name"
-              value={dataUser.second_name}
+              name="last_name"
+              value={dataUser.last_name}
               isReadOnly={!isEditable}
               onChange={handleChange}
             />
