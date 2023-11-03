@@ -86,7 +86,7 @@ const SignUp = () => {
       formData.append('nickname', values.nickname);
       formData.append('avatar_name', values.avatarName);
 
-      const response = await axios.post('http://localhost:8000/splitcount/sign-up/', formData, {
+      const response = await axios.post('https://splitcount.fly.dev/splitcount/sign-up/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

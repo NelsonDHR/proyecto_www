@@ -47,7 +47,7 @@ const LogIn = () => {
       formData.append('username', values.email);
       formData.append('password', values.password);
 
-      const response = await axios.post('http://localhost:8000/splitcount/log-in/', formData);
+      const response = await axios.post('https://splitcount.fly.dev/splitcount/log-in/', formData);
       localStorage.setItem('token', response.data.token);
       navigateTo('/home');
     } catch (error) {
