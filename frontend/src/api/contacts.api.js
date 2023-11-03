@@ -7,15 +7,15 @@ const config = {
   }
 
 export const getAllContacts = () =>{
-    return axios.get('http://127.0.0.1:8000/splitcount/contacts/', config)
+    return axios.get('https://splitcount.fly.dev/splitcount/contacts/', config)
 }
 
 export const addContact = (contact) =>{
-    return axios.post('http://127.0.0.1:8000/splitcount/contacts/', contact, config)
+    return axios.post('https://splitcount.fly.dev/splitcount/contacts/', contact, config)
 }
 
 export const deleteContact = (contact) => {
-  return axios.delete('http://127.0.0.1:8000/splitcount/contacts/', { 
+  return axios.delete('https://splitcount.fly.dev/splitcount/contacts/', { 
     data: contact,
     headers: config.headers,
   });

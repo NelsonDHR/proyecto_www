@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-drytzy1-5ah0*v0rzma5l%pet_9_v5k3sr^r=f)tkkk$lapc%z"
+SECRET_KEY = 'una_clave_secreta_larga_y_aleatoria_45451234546541234135215313651354351213513645315541'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -44,6 +44,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -143,3 +145,13 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
 }
+
+
+SECURE_HSTS_SECONDS = 3600 # Ajusta este valor según tus necesidades
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_SSL_REDIRECT = False
+SECURE_HSTS_PRELOAD = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+DEBUG = False
+ALLOWED_HOSTS = ['www.splitcount.fly.dev', 'splitcount.fly.dev'] # Ajusta esto a tus dominios

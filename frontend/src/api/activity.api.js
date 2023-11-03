@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const url = "http://127.0.0.1:8000/splitcount/api/activities/";
+const url = "https://splitcount.fly.dev/splitcount/api/activities/";
 
 const config = {
   headers: {
@@ -17,7 +17,7 @@ export const createActivity = (activity) => {
 };
 
 export const putActivity = (id_activity, activity) => {
-  const urlId = `http://127.0.0.1:8000/splitcount/api/activities/${id_activity}/`;
+  const urlId = `https://splitcount.fly.dev/splitcount/api/activities/${id_activity}/`;
   return axios.put(
     urlId,
     activity,
