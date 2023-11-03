@@ -23,7 +23,34 @@ class LogOutView(APIView):
     def get(self, request, format=None):
         request.user.auth_token.delete()
         return Response(status=status.HTTP_200_OK)
-    
+
+
+class ContactsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        contacts = request.user.contacts.all()
+        serializer = UserSerializer(contacts, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, *args, **kwargs):
+        serializer = ContactSerializer(data=request.data)
+        if serializer.is_valid():
+            contact = User.objects.get(email=serializer.validated_data['email'])
+            request.user.contacts.add(contact)
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, *args, **kwargs):
+        serializer = ContactSerializer(data=request.data)
+        if serializer.is_valid():
+            contact = User.objects.get(email=serializer.validated_data['email'])
+            request.user.contacts.remove(contact)
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class EventView(viewsets.ModelViewSet):
     serializer_class = EventSerializer

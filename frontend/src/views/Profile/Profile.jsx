@@ -12,7 +12,7 @@ import {
 import { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
 import Events from "../Events/Events";
-import Contatcs from "../Contacts/Contacts";
+import Contatcs from "../Contacts/ContactsView";
 import { getUser, updateUser } from "../../api/profile.api";
 
 const Profile = () => {

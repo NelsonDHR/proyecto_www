@@ -22,7 +22,7 @@ const Navbar = ({ selectedOption, handleOptionClick }) => {
       px={4}
       py={4}
       height="70px"
-      position="fixed"
+      position="sticky"
       top={0}
       left={0}
       right={0}
@@ -56,24 +56,25 @@ const Navbar = ({ selectedOption, handleOptionClick }) => {
               Events
             </Box>
           </Link>
-
-          <Box
-            onClick={() => handleOptionClick("contacts")}
-            bg={
-              selectedOption === "contacts"
-                ? colorMode === "light"
-                  ? "gray.200"
-                  : "gray.500"
-                : "transparent"
-            }
-            px={2}
-            py={1}
-            borderRadius="md"
-            cursor="pointer"
-            mr={4}
-          >
-            Contacts
-          </Box>
+          <Link to="/contacts">
+            <Box
+              onClick={() => handleOptionClick("contacts")}
+              bg={
+                selectedOption === "contacts"
+                  ? colorMode === "light"
+                    ? "gray.200"
+                    : "gray.500"
+                  : "transparent"
+              }
+              px={2}
+              py={1}
+              borderRadius="md"
+              cursor="pointer"
+              mr={4}
+            >
+              Contacts
+            </Box>
+          </Link>
           <Link to="/profile">
             <Box
               onClick={() => handleOptionClick("profile")}

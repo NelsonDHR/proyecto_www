@@ -6,7 +6,7 @@ import {
 import { useState } from 'react';
 import Navbar from '../components/Navbar';
 import Events from './Events/Events';
-import Contatcs from './Contacts/Contacts';
+import ContactsView from './Contacts/ContactsView';
 
 const Home = () => {
   const { colorMode } = useColorMode();
@@ -27,7 +27,7 @@ const Home = () => {
       bg={colorMode === 'light' ? 'gray.200' : 'gray.800'}
     >
       <Navbar selectedOption={selectedOption} handleOptionClick={handleOptionClick} />
-      {selectedOption === 'events' ? <Events /> : <Contatcs />}
+      {selectedOption === 'events' ? <Events /> : (selectedOption === 'contacts' ? <ContactsView /> : <Profile />)}
     </Box>
   );
 };

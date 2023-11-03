@@ -10,6 +10,7 @@ urlpatterns = [
     path('sign-up/', SignUpView.as_view()),
     path('log-in/', LogInView.as_view()),
     path('log-out/', LogOutView.as_view()),
+    path('contacts/', ContactsView.as_view(), name='contacts'),
     path("api/", include(router.urls)),
     path("user/", UserDetailView.as_view(), name='user-detail'),
     # path('sign-up/', sign_up, name='create-account'),
