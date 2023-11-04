@@ -5,4 +5,4 @@
 - Jorge Eduardo Arias Muñoz          - 202042055.
 
 ## Link de la página en funcionamiento.
-- Puede acceder a la aplicación ya desplegada por medio de esta url: Aún en proceso...
+- Puede acceder a la aplicación ya desplegada por medio de esta url: https://jorgeasmz-splitcount.netlify.app/
