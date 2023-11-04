@@ -10,7 +10,14 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+from dotenv import load_dotenv
 from pathlib import Path
+from urllib.parse import urlparse
+
+import os
+
+# Load .env file
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,13 +27,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'una_clave_secreta_larga_y_aleatoria_45451234546541234135215313651354351213513645315541'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
+
+# Other environment variables
+FRONTEND_URL_LOCAL = os.getenv('FRONTEND_URL_LOCAL')
+FRONTEND_URL_PROD = os.getenv('FRONTEND_URL_PROD')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = [urlparse(FRONTEND_URL_PROD).hostname]
 
 # Application definition
 
@@ -131,7 +141,8 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8080",
+    FRONTEND_URL_LOCAL,
+    FRONTEND_URL_PROD
 ]
 
 AUTH_USER_MODEL = 'splitcount.User'
@@ -147,11 +158,9 @@ REST_FRAMEWORK = {
 }
 
 # Deploy settings
-# SECURE_HSTS_SECONDS = 3600 # Ajusta este valor según tus necesidades
-# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-# SECURE_SSL_REDIRECT = False
-# SECURE_HSTS_PRELOAD = True
-# SESSION_COOKIE_SECURE = True
-# CSRF_COOKIE_SECURE = True
-# DEBUG = False
-# ALLOWED_HOSTS = ['www.splitcount.fly.dev', 'splitcount.fly.dev'] # Ajusta esto a tus dominios
+SECURE_HSTS_SECONDS = 3600
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_SSL_REDIRECT = False
+SECURE_HSTS_PRELOAD = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True

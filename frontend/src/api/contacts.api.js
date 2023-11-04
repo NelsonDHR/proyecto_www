@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-// const url = "http://localhost:8000/splitcount/contacts/";
-const url = import.meta.env.BACKEND_URL + "/splitcount/contacts/";
+// const url = import.meta.env.BACKEND_URL_LOCAL + "/splitcount/contacts/";
+const url = import.meta.env.BACKEND_URL_PROD + "/splitcount/contacts/";
 
 const getConfig = () => ({
   headers: {

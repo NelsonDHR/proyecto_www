@@ -322,7 +322,7 @@ const SignUp = () => {
             justifyContent="center"
             m={6}
           >
-            <Link href="/log-in">Already have an account? Log in here.</Link>
+            <Link onClick={() => navigateTo('/log-in')}>Already have an account? Log in here.</Link>
           </Box>
         </Box>
       )}

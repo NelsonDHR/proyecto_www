@@ -1,8 +1,8 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import { HashRouter } from 'react-router-dom'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { HashRouter } from 'react-router-dom';
 import { ChakraProvider } from '@chakra-ui/react';
-import { ColorModeScript } from "@chakra-ui/color-mode";
+import { ColorModeScript } from '@chakra-ui/color-mode';
 
 import App from './App.jsx'
 import Theme from './Theme'

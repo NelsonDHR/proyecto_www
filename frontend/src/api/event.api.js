@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// const url = "http://localhost:8000/splitcount/api/event/";
-const url = import.meta.env.BACKEND_URL + "/splitcount/api/event/";
+// const url = import.meta.env.BACKEND_URL_LOCAL + "/splitcount/api/event/";
+const url = import.meta.env.BACKEND_URL_PROD + "/splitcount/api/event/";
 
 const getConfig = () => ({
   headers: {

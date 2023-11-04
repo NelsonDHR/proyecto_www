@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const url = "http://localhost:8000/splitcount/user/";
+// const url = import.meta.env.BACKEND_URL_LOCAL + "/splitcount/user/";
+const url = import.meta.env.BACKEND_URL_PROD + "/splitcount/user/";
 
 const getConfig = () => ({
   headers: {

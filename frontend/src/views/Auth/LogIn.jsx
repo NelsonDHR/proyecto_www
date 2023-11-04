@@ -18,7 +18,7 @@ import * as Yup from 'yup';
 
 import ToggleColorMode from '../../components/ToggleColorMode';
 
-import { logIn } from '../../api/auth.api';
+import { logIn, signUp } from '../../api/auth.api';
 
 const LogInSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Required'),
@@ -158,7 +158,7 @@ const LogIn = () => {
               </Form>
             )}
           </Formik>
-          <Link mt="4" href="/sign-up">Don't have an account? Sign up here.</Link>
+          <Link mt="4" onClick={() => navigateTo('/sign-up')}>Don't have an account? Sign up here.</Link>
         </Box>
       )}
     </Box>
