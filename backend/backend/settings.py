@@ -36,7 +36,7 @@ FRONTEND_URL_PROD = os.getenv('FRONTEND_URL_PROD')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = [urlparse(FRONTEND_URL_PROD).hostname]
+ALLOWED_HOSTS = ['splitcount.fly.dev', 'www.splitcount.fly.dev']
 
 # Application definition
 

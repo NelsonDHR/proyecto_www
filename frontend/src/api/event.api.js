@@ -14,7 +14,6 @@ export const getAllEvents = () => {
 };
 
 export const createEvent = (event) => {
-  console.log(config);
   return axios.post(url, event, getConfig());
 };
 

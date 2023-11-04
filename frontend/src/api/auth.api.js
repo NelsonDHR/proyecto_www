@@ -10,7 +10,6 @@ const getConfig = () => ({
 });
 
 export const signUp = (signUpAttempt) => {
-  console.log(url)
   return axios.post(`${url}sign-up/`, signUpAttempt);
 };
 
