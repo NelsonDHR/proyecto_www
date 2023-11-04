@@ -131,7 +131,7 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
+    "http://localhost:8080",
 ]
 
 AUTH_USER_MODEL = 'splitcount.User'
@@ -146,12 +146,12 @@ REST_FRAMEWORK = {
     ],
 }
 
-
-SECURE_HSTS_SECONDS = 3600 # Ajusta este valor según tus necesidades
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_SSL_REDIRECT = False
-SECURE_HSTS_PRELOAD = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-DEBUG = False
-ALLOWED_HOSTS = ['www.splitcount.fly.dev', 'splitcount.fly.dev'] # Ajusta esto a tus dominios
+# Deploy settings
+# SECURE_HSTS_SECONDS = 3600 # Ajusta este valor según tus necesidades
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+# SECURE_SSL_REDIRECT = False
+# SECURE_HSTS_PRELOAD = True
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
+# DEBUG = False
+# ALLOWED_HOSTS = ['www.splitcount.fly.dev', 'splitcount.fly.dev'] # Ajusta esto a tus dominios

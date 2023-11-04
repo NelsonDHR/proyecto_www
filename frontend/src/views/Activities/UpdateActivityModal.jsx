@@ -12,11 +12,8 @@ import {
   FormControl,
   FormLabel,
   Input,
-  Select,
-  Text,
 } from "@chakra-ui/react";
 import { putActivity } from "../../api/activity.api";
-import { AddIcon, CalendarIcon } from "@chakra-ui/icons";
 
 const UpdateActivityModal = ({ refreshActivity, activity,  ...props }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -54,19 +51,31 @@ const UpdateActivityModal = ({ refreshActivity, activity,  ...props }) => {
     }
   };
 
-  const [isHovered, setIsHovered] = useState(false);
-
   return (
     <>
-      <Button onClick={onOpen}>Ver actividad</Button>
+      <Button onClick={onOpen}>Edit Activity</Button>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Crear Actividad</ModalHeader>
+        <ModalContent margin="auto">
+          <ModalHeader pb={4}>Edit Activity</ModalHeader>
           <ModalCloseButton />
-          <ModalBody>
-            <FormControl>
-              <FormLabel>Creador actividad</FormLabel>
+          <ModalBody
+            maxH="400px"
+            overflowY="scroll"
+            css={{
+              '&::-webkit-scrollbar': {
+                width: '4px',
+              },
+              '&::-webkit-scrollbar-track': {
+                width: '6px',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                background: 'gray',
+                borderRadius: '24px',
+              }
+            }}>
+            <FormControl mb={4}>
+              <FormLabel>Creator</FormLabel>
               <Input
                 type="text"
                 name="creator"
@@ -75,8 +84,8 @@ const UpdateActivityModal = ({ refreshActivity, activity,  ...props }) => {
                 readOnly
               />
             </FormControl>
-            <FormControl>
-              <FormLabel>Nombre de la actividad</FormLabel>
+            <FormControl mb={4}>
+              <FormLabel>Name of the activity</FormLabel>
               <Input
                 type="text"
                 name="name"
@@ -84,8 +93,8 @@ const UpdateActivityModal = ({ refreshActivity, activity,  ...props }) => {
                 onChange={handleChange}
               />
             </FormControl>
-            <FormControl>
-              <FormLabel>Descripción del evento</FormLabel>
+            <FormControl mb={4}>
+              <FormLabel>Event description</FormLabel>
               <Input
                 type="text"
                 name="description"
@@ -93,8 +102,8 @@ const UpdateActivityModal = ({ refreshActivity, activity,  ...props }) => {
                 onChange={handleChange}
               />
             </FormControl>
-            <FormControl>
-              <FormLabel>Valor actividad</FormLabel>
+            <FormControl mb={4}>
+              <FormLabel>Value of the activity</FormLabel>
               <Input
                 type="number"
                 name="value"
@@ -102,8 +111,8 @@ const UpdateActivityModal = ({ refreshActivity, activity,  ...props }) => {
                 onChange={handleChange}
               />
             </FormControl>
-            <FormControl>
-              <FormLabel>Evento al que pertenece la actividad</FormLabel>
+            <FormControl mb={4}>
+              <FormLabel>Event of the activity</FormLabel>
               <Input
                 type="number"
                 name="event"
@@ -112,8 +121,8 @@ const UpdateActivityModal = ({ refreshActivity, activity,  ...props }) => {
                 readOnly
               />
             </FormControl>
-            <FormControl>
-              <FormLabel>Participante actividad</FormLabel>
+            <FormControl mb={4}>
+              <FormLabel>Participants of the activity</FormLabel>
               <Input
                 type="number"
                 name="participants"
@@ -124,10 +133,10 @@ const UpdateActivityModal = ({ refreshActivity, activity,  ...props }) => {
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={onClose}>
-              Cancelar
+              Cancel
             </Button>
             <Button colorScheme="green" onClick={handleSubmit}>
-              Actualizar
+              Update
             </Button>
           </ModalFooter>
         </ModalContent>

@@ -9,11 +9,11 @@ import {
   MenuItem,
   useColorMode,
 } from "@chakra-ui/react";
-import { FaBars } from "react-icons/fa";
 import ToggleColorMode from "./ToggleColorMode";
 import { Link } from "react-router-dom";
 
-const Navbar = ({ selectedOption, handleOptionClick }) => {
+const Navbar = ({ selectedOption, handleOptionClick, handleLogOut }) => {
+
   const { colorMode } = useColorMode();
 
   return (
@@ -37,73 +37,56 @@ const Navbar = ({ selectedOption, handleOptionClick }) => {
           </Link>
         </Box>
         <Box display="flex" alignItems="center">
-          <Link to="/events">
-            <Box
-              onClick={() => handleOptionClick("events")}
-              bg={
-                selectedOption === "events"
-                  ? colorMode === "light"
-                    ? "gray.200"
-                    : "gray.500"
-                  : "transparent"
-              }
-              px={2}
-              py={1}
-              borderRadius="md"
-              cursor="pointer"
-              mr={4}
-            >
-              Events
-            </Box>
-          </Link>
-          <Link to="/contacts">
-            <Box
-              onClick={() => handleOptionClick("contacts")}
-              bg={
-                selectedOption === "contacts"
-                  ? colorMode === "light"
-                    ? "gray.200"
-                    : "gray.500"
-                  : "transparent"
-              }
-              px={2}
-              py={1}
-              borderRadius="md"
-              cursor="pointer"
-              mr={4}
-            >
-              Contacts
-            </Box>
-          </Link>
-          <Link to="/profile">
-            <Box
-              onClick={() => handleOptionClick("profile")}
-              bg={
-                selectedOption === "profile"
-                  ? colorMode === "light"
-                    ? "gray.200"
-                    : "gray.500"
-                  : "transparent"
-              }
-              px={2}
-              py={1}
-              borderRadius="md"
-              cursor="pointer"
-              mr={4}
-            >
-              Profile
-            </Box>
-          </Link>
+
+          <Box
+            onClick={() => handleOptionClick("events")}
+            bg={
+              selectedOption === "events"
+                ? colorMode === "light"
+                  ? "gray.200"
+                  : "gray.500"
+                : "transparent"
+            }
+            px={2}
+            py={1}
+            borderRadius="md"
+            cursor="pointer"
+            mr={4}
+          >
+            Events
+          </Box>
+          <Box
+            onClick={() => handleOptionClick("contacts")}
+            bg={
+              selectedOption === "contacts"
+                ? colorMode === "light"
+                  ? "gray.200"
+                  : "gray.500"
+                : "transparent"
+            }
+            px={2}
+            py={1}
+            borderRadius="md"
+            cursor="pointer"
+            mr={4}
+          >
+            Contacts
+          </Box>
           <Menu>
             <MenuButton
               as={Avatar}
               size="sm"
               src="https://bit.ly/dan-abramov"
               cursor="pointer"
+              border={selectedOption == "profile" ?
+                colorMode === "light" ?
+                  "2px solid black" :
+                  "2px solid white" :
+                  "none"}
             />
             <MenuList>
-              <MenuItem>Profile</MenuItem>
-              <MenuItem>Log Out</MenuItem>
+              <MenuItem onClick={() => handleOptionClick("profile")}>Profile</MenuItem>
+              <MenuItem onClick={() => handleLogOut()}>Log Out</MenuItem>
             </MenuList>
           </Menu>
           <ToggleColorMode />

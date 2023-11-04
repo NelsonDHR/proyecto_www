@@ -1,18 +1,17 @@
 import axios from "axios";
 
-const url = "https://splitcount.fly.dev/splitcount/user/";
+const url = "http://localhost:8000/splitcount/user/";
 
-const config = {
+const getConfig = () => ({
   headers: {
     Authorization: `token ${localStorage.getItem("token")}`,
-    "Content-Type": "application/json",
   },
-};
+});
 
 export const getUser = () => {
-  return axios.get(url, config);
+  return axios.get(url, getConfig());
 };
 
 export const updateUser = (user) => {
-  return axios.put(url, user, config);
+  return axios.put(url, user, getConfig());
 };

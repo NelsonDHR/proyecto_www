@@ -12,10 +12,11 @@ import {
   FormControl,
   FormLabel,
   Input,
+  Icon,
   Text
 } from "@chakra-ui/react";
-import { addContact } from '../../api/contacts.api'; // Asegúrate de tener esta función en tu API
-import { AddIcon, PlusSquareIcon } from '@chakra-ui/icons';
+import { addContact } from '../../api/contacts.api';
+import { IoMdContact } from "react-icons/io";
 
 const AddContactModal = ({ updateContacts, ...props }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -65,17 +66,17 @@ const AddContactModal = ({ updateContacts, ...props }) => {
         }}
         width={isHovered ? "160px" : "40px"}
       >
-        {isHovered ? <PlusSquareIcon /> : <AddIcon />}
+        <Icon as={IoMdContact} boxSize={6} />
         {isHovered && <Text ml={2} fontSize={17.5}>Add Contact</Text>}
       </Button>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Agregar Contacto</ModalHeader>
+        <ModalContent margin="auto">
+          <ModalHeader pb={4}>Add Contact</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <FormControl>
-              <FormLabel>Correo electrónico del contacto</FormLabel>
+            <FormControl mb={4}>
+              <FormLabel>Contact's email</FormLabel>
               <Input
                 type="email"
                 name="email"
@@ -86,10 +87,10 @@ const AddContactModal = ({ updateContacts, ...props }) => {
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={onClose}>
-              Cancelar
+              Cancel
             </Button>
             <Button colorScheme="green" onClick={handleSubmit}>
-              Agregar
+              Add
             </Button>
           </ModalFooter>
         </ModalContent>

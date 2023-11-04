@@ -1,0 +1,21 @@
+name: Continous Deployment
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  
+  backend-deploy:
+
+    name: Deploy app
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: |
+          cd ${{ github.workspace }}/backend
+          flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
