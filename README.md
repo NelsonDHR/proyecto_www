@@ -1,4 +1,4 @@
-# proyecto_www
+# Splitcount Web Application
 ## Integrantes.
 - Nelson Daniel Herrera Rey          - 201841270.
 - Miguel Angel Fernandez Villaquirán - 201941923.
