@@ -16,14 +16,7 @@ import {
   Text
 } from "@chakra-ui/react";
  import { createEvent } from '../../api/event.api';
-import { AddIcon, CalendarIcon } from '@chakra-ui/icons';
-/* import { jwtDecode } from "jwt-decode";
-
-
-
-const token = localStorage.getItem('token')
-const decodedToken = jwtDecode(token);
-const userId = decodedToken ? decodedToken.userId : null;  */
+import { CalendarIcon } from '@chakra-ui/icons';
 
 const AddEventModal = ({ updateEvents, ...props }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -86,17 +79,17 @@ const AddEventModal = ({ updateEvents, ...props }) => {
         }}
         width={isHovered ? "150px" : "40px"}
       >
-        {isHovered ? <CalendarIcon /> : <AddIcon />}
+        <CalendarIcon />
         {isHovered && <Text ml={2} fontSize={17.5}>Add Event</Text>}
       </Button>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Crear Evento</ModalHeader>
+        <ModalContent margin="auto">
+          <ModalHeader pb={4}>Create Event</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <FormControl>
-              <FormLabel>Nombre del evento</FormLabel>
+            <FormControl mb={4}>
+              <FormLabel>Name of the event</FormLabel>
               <Input
                 type="text"
                 name="name"
@@ -104,8 +97,8 @@ const AddEventModal = ({ updateEvents, ...props }) => {
                 onChange={handleChange}
               />
             </FormControl>
-            <FormControl>
-              <FormLabel>Descripción del evento</FormLabel>
+            <FormControl mb={4}>
+              <FormLabel>Description of the event</FormLabel>
               <Input
                 type="text"
                 name="description"
@@ -113,28 +106,28 @@ const AddEventModal = ({ updateEvents, ...props }) => {
                 onChange={handleChange}
               />
             </FormControl>
-            <FormControl>
-              <FormLabel>Tipo de Evento</FormLabel>
+            <FormControl mb={4}>
+              <FormLabel>Type of event</FormLabel>
               <Select
                 name="event_type"
                 value={eventData.event_type}
                 onChange={handleChange}
               >
-                <option value="">Selecciona un tipo de evento</option>
-                <option value="TR">Viaje</option>
-                <option value="HM">Hogar</option>
-                <option value="PR">Pareja</option>
-                <option value="FD">Comida</option>
-                <option value="OT">Otro</option>
+                <option value="">Select a type of event</option>
+                <option value="TR">Travel</option>
+                <option value="HM">Home</option>
+                <option value="PR">Couple</option>
+                <option value="FD">Food</option>
+                <option value="OT">Other</option>
               </Select>
             </FormControl>
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={onClose}>
-              Cancelar
+              Cancel
             </Button>
             <Button colorScheme="green" onClick={handleSubmit}>
-              Crear
+              Create
             </Button>
           </ModalFooter>
         </ModalContent>

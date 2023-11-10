@@ -7,7 +7,8 @@ from .models import *
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['email', 'first_name', 'last_name', 'nickname', 'password', 'avatar_name']
+        fields = ['email', 'first_name', 'last_name',
+                  'nickname', 'password', 'avatar_name']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -26,20 +27,23 @@ class LogInSerializer(serializers.ModelSerializer):
 
 class ContactSerializer(serializers.Serializer):
     email = serializers.EmailField()
-    
+
 
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
-        exclude = ['date']  # Excluir el campo 'date' de los campos serializados
+        # Excluir el campo 'date' de los campos serializados
+        exclude = ['date']
 
     def create(self, validated_data):
-        validated_data['date'] = timezone.now()  # Importa timezone desde django.utils
+        # Importa timezone desde django.utils
+        validated_data['date'] = timezone.now()
         event = Event(**validated_data)
         event.save()
         return event
 
-class Activity_serializer(serializers.ModelSerializer):
+
+class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
-        fields = '__all__'  
+        fields = '__all__'

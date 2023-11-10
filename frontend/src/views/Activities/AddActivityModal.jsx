@@ -8,15 +8,16 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Box,
   Button,
   FormControl,
   FormLabel,
   Input,
-  Select,
+  Icon,
   Text,
 } from "@chakra-ui/react";
 import { createActivity } from "../../api/activity.api";
-import { AddIcon, CalendarIcon } from "@chakra-ui/icons";
+import { RxActivityLog } from "react-icons/rx";
 
 const AddActivityModal = ({ updateActivity, ...props }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -80,7 +81,7 @@ const AddActivityModal = ({ updateActivity, ...props }) => {
         }}
         width={isHovered ? "150px" : "40px"}
       >
-        {isHovered ? <CalendarIcon /> : <AddIcon />}
+        <Icon as={RxActivityLog} />
         {isHovered && (
           <Text ml={2} fontSize={17.5}>
             Add Activity
@@ -89,12 +90,26 @@ const AddActivityModal = ({ updateActivity, ...props }) => {
       </Button>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Crear Actividad</ModalHeader>
+        <ModalContent margin="auto">
+          <ModalHeader pb={4}>Create Activity</ModalHeader>
           <ModalCloseButton />
-          <ModalBody>
-            <FormControl>
-              <FormLabel>Creador actividad</FormLabel>
+          <ModalBody
+            maxH="400px"
+            overflowY="scroll"
+            css={{
+              '&::-webkit-scrollbar': {
+                width: '4px',
+              },
+              '&::-webkit-scrollbar-track': {
+                width: '6px',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                background: 'gray',
+                borderRadius: '24px',
+              }
+            }}>
+            <FormControl mb={4}>
+              <FormLabel>Creator</FormLabel>
               <Input
                 type="text"
                 name="creator"
@@ -102,8 +117,8 @@ const AddActivityModal = ({ updateActivity, ...props }) => {
                 onChange={handleChange}
               />
             </FormControl>
-            <FormControl>
-              <FormLabel>Nombre de la actividad</FormLabel>
+            <FormControl mb={4}>
+              <FormLabel>Name of the activity</FormLabel>
               <Input
                 type="text"
                 name="name"
@@ -111,8 +126,8 @@ const AddActivityModal = ({ updateActivity, ...props }) => {
                 onChange={handleChange}
               />
             </FormControl>
-            <FormControl>
-              <FormLabel>Descripción del evento</FormLabel>
+            <FormControl mb={4}>
+              <FormLabel>Event description</FormLabel>
               <Input
                 type="text"
                 name="description"
@@ -120,8 +135,8 @@ const AddActivityModal = ({ updateActivity, ...props }) => {
                 onChange={handleChange}
               />
             </FormControl>
-            <FormControl>
-              <FormLabel>Valor actividad</FormLabel>
+            <FormControl mb={4}>
+              <FormLabel>Value of the activity</FormLabel>
               <Input
                 type="number"
                 name="value"
@@ -129,8 +144,8 @@ const AddActivityModal = ({ updateActivity, ...props }) => {
                 onChange={handleChange}
               />
             </FormControl>
-            <FormControl>
-              <FormLabel>Evento al que pertenece la actividad</FormLabel>
+            <FormControl mb={4}>
+              <FormLabel>Event of the activity</FormLabel>
               <Input
                 type="number"
                 name="event"
@@ -138,8 +153,8 @@ const AddActivityModal = ({ updateActivity, ...props }) => {
                 onChange={handleChange}
               />
             </FormControl>
-            <FormControl>
-              <FormLabel>Participante actividad</FormLabel>
+            <FormControl mb={4}>
+              <FormLabel>Participants of the activity</FormLabel>
               <Input
                 type="number"
                 name="participants"
@@ -150,10 +165,10 @@ const AddActivityModal = ({ updateActivity, ...props }) => {
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={onClose}>
-              Cancelar
+              Cancel
             </Button>
             <Button colorScheme="green" onClick={handleSubmit}>
-              Crear
+              Create
             </Button>
           </ModalFooter>
         </ModalContent>

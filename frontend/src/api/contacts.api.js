@@ -1,22 +1,25 @@
 import axios from 'axios'
 
-const config = {
-    headers: {
-      'Authorization': `token ${localStorage.getItem('token')}`
-    }
-  }
+// const url = import.meta.env.VITE_BACKEND_URL_LOCAL + "/splitcount/contacts/";
+const url = import.meta.env.VITE_BACKEND_URL_PROD + "/splitcount/contacts/";
+
+const getConfig = () => ({
+  headers: {
+    Authorization: `token ${localStorage.getItem("token")}`,
+  },
+});
 
 export const getAllContacts = () =>{
-    return axios.get('http://127.0.0.1:8000/splitcount/contacts/', config)
+    return axios.get(url, getConfig())
 }
 
 export const addContact = (contact) =>{
-    return axios.post('http://127.0.0.1:8000/splitcount/contacts/', contact, config)
+    return axios.post(url, contact, getConfig())
 }
 
 export const deleteContact = (contact) => {
-  return axios.delete('http://127.0.0.1:8000/splitcount/contacts/', { 
+  return axios.delete(url, { 
     data: contact,
-    headers: config.headers,
+    headers: getConfig().headers,
   });
 }
