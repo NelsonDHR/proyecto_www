@@ -4,15 +4,13 @@ from .views import *
 
 router = routers.DefaultRouter()
 router.register(r'event', EventView, 'event')
-router.register(r'activities', Activity_view, 'activities')
+router.register(r'activities', ActivityView, 'activities')
 
 urlpatterns = [
-    path('sign-up/', SignUpView.as_view()),
-    path('log-in/', LogInView.as_view()),
-    path('log-out/', LogOutView.as_view()),
+    path('sign-up/', SignUpView.as_view(), name='create-account'),
+    path('log-in/', LogInView.as_view(), name='log-in'),
+    path('log-out/', LogOutView.as_view(), name='log-out'),
     path('contacts/', ContactsView.as_view(), name='contacts'),
-    path("api/", include(router.urls)),
     path("user/", UserDetailView.as_view(), name='user-detail'),
-    # path('sign-up/', sign_up, name='create-account'),
-    # path('log-in/', log_in, name='log-in'),
+    path("api/", include(router.urls)),
 ]

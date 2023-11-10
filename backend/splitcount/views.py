@@ -9,8 +9,8 @@ from .serializers import *
 
 class SignUpView(generics.CreateAPIView):
     queryset = User.objects.all()
-    permission_classes = [AllowAny]
     authentication_classes = []
+    permission_classes = [AllowAny]
     serializer_class = UserSerializer
 
 
@@ -36,7 +36,8 @@ class ContactsView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = ContactSerializer(data=request.data)
         if serializer.is_valid():
-            contact = User.objects.get(email=serializer.validated_data['email'])
+            contact = User.objects.get(
+                email=serializer.validated_data['email'])
             request.user.contacts.add(contact)
             return Response(status=status.HTTP_200_OK)
         else:
@@ -45,7 +46,8 @@ class ContactsView(APIView):
     def delete(self, request, *args, **kwargs):
         serializer = ContactSerializer(data=request.data)
         if serializer.is_valid():
-            contact = User.objects.get(email=serializer.validated_data['email'])
+            contact = User.objects.get(
+                email=serializer.validated_data['email'])
             request.user.contacts.remove(contact)
             return Response(status=status.HTTP_200_OK)
         else:
@@ -57,12 +59,11 @@ class EventView(viewsets.ModelViewSet):
     queryset = Event.objects.all()
 
     def create(self, request, *args, **kwargs):
-        
+
         # Get current user
         request_data = request.data.copy()
         request_data["creator"] = request.user.id
-        # Get current user
-        
+
         serializer = self.get_serializer(data=request_data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -70,16 +71,18 @@ class EventView(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
-class Activity_view(viewsets.ModelViewSet):
-    serializer_class = Activity_serializer
+class ActivityView(viewsets.ModelViewSet):
+    serializer_class = ActivitySerializer
     queryset = Activity.objects.all()
-    
+
+
 class UserDetailView(generics.RetrieveAPIView):
-    serializer_class=UserSerializer
-    permission_classes=[IsAuthenticated]
-    
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
     def get_object(self):
         return self.request.user
+
     def put(self, request, *args, **kwargs):
         # Obtiene el objeto de usuario que se está actualizando
         user = self.get_object()

@@ -1,25 +1,23 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Heading,
-  Input,
-  Link,
-  useColorMode,
   Grid,
   GridItem,
+  Heading,
   Image,
+  Input,
+  Link,
   Spinner,
-  Stack,
   Text,
+  useColorMode,
 } from '@chakra-ui/react';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import axios from 'axios';
-import { useNavigate } from "react-router-dom";
 
 import man1 from '../../assets/avatars/man-1.png';
 import man2 from '../../assets/avatars/man-2.png';
@@ -31,6 +29,8 @@ import bear from '../../assets/avatars/bear.png';
 import cat from '../../assets/avatars/cat.png';
 import panda from '../../assets/avatars/panda.png';
 import ToggleColorMode from '../../components/ToggleColorMode';
+
+import { signUp } from '../../api/auth.api';
 
 const SignUpSchema = Yup.object().shape({
   firstName: Yup.string().required('Required'),
@@ -62,10 +62,9 @@ const SignUp = () => {
   useEffect(() => {
     let timeoutId;
     if (isSuccess) {
-      setMessage('User created!');
       timeoutId = setTimeout(() => {
-        setMessage('Redirecting to login...');
         setIsLoading(true);
+        setMessage('Redirecting to login...');
         timeoutId = setTimeout(() => {
           navigateTo('/log-in');
         }, 3000);
@@ -86,18 +85,14 @@ const SignUp = () => {
       formData.append('nickname', values.nickname);
       formData.append('avatar_name', values.avatarName);
 
-      const response = await axios.post('https://splitcount.fly.dev/splitcount/sign-up/', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      console.log(response.data);
-      setMessage('User created!');
+      const response = await signUp(formData);
       setIsSuccess(true);
+      setMessage('User created!');
+      console.log(response.data);
     } catch (error) {
-      setMessage('Could not creat the user!');
-      console.log(error.response.data);
       setIsSuccess(false);
+      setMessage('Could not creat the user!');
+      console.error('Error al crear el usuario:', error.response.data);
     } finally {
       actions.setSubmitting(false);
     }
@@ -145,16 +140,18 @@ const SignUp = () => {
             maxHeight="390px"
             overflow="auto"
             width="100%"
-            css={`
-          /* For WebKit-based browsers (Chrome, Safari) */
-          ::-webkit-scrollbar {
-            width: 0;
-          }
-
-          /* For Firefox */
-          scrollbar-width: none;
-        `}
-          >
+            css={{
+              '&::-webkit-scrollbar': {
+                width: '4px',
+              },
+              '&::-webkit-scrollbar-track': {
+                width: '6px',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                background: 'gray',
+                borderRadius: '24px',
+              }
+            }}>
             <Formik
               initialValues={{
                 firstName: '',
@@ -325,7 +322,7 @@ const SignUp = () => {
             justifyContent="center"
             m={6}
           >
-            <Link href="/log-in">Already have an account? Log in here.</Link>
+            <Link onClick={() => navigateTo('/log-in')}>Already have an account? Log in here.</Link>
           </Box>
         </Box>
       )}
@@ -338,7 +335,7 @@ const SignUp = () => {
         rounded="md"
         border="1px solid"
         borderColor={isSuccess ? 'green.200' : 'red.200'}
-        hidden={!message}
+        hidden={!message || isLoading}
       >
         {message}
       </Box>

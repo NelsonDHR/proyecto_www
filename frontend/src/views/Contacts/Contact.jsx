@@ -46,7 +46,7 @@ const Contact = ({ contact, updateContacts }) => {
         </Box>
         <Spacer />
         <Button leftIcon={<DeleteIcon />} colorScheme="red" variant="outline" onClick={handleDelete}>
-          Eliminar
+          Delete
         </Button>
       </Flex>
     </Box>

@@ -10,9 +10,6 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
-import Navbar from "../../components/Navbar";
-import Events from "../Events/Events";
-import Contatcs from "../Contacts/ContactsView";
 import { getUser, updateUser } from "../../api/profile.api";
 
 const Profile = () => {
@@ -56,7 +53,7 @@ const Profile = () => {
   };
 
   const handleUpdate = async () => {
-    //Enviar actualización a la bd, uso de API.
+    // Enviar actualización a la bd, uso de API.
     setIsEditable(false);
     try {
       const newUpdateUser = await updateUser(dataUser);
@@ -79,10 +76,6 @@ const Profile = () => {
       overflow="hidden"
       bg={colorMode === "light" ? "gray.200" : "gray.800"}
     >
-      <Navbar
-        selectedOption={selectedOption}
-        handleOptionClick={handleOptionClick}
-      />
       <Box
         display="flex"
         flexDirection="column"
@@ -90,10 +83,10 @@ const Profile = () => {
         justifyContent="center"
         flex="1" // Para ocupar el espacio restante en el contenedor principal
       >
-        <Heading as="h1" size="lg" mb="6">
+        <Heading as="h1" size="lg" mb={6}>
           Hey you! This is your profile.
         </Heading>
-        <Box w="80%" maxW="400px">
+        <Box w="80%" maxW="400px" mb={4}>
           <FormControl>
             <FormLabel>First name</FormLabel>
             <Input
@@ -107,7 +100,7 @@ const Profile = () => {
             />
           </FormControl>
         </Box>
-        <Box w="80%" maxW="400px">
+        <Box w="80%" maxW="400px" mb={4}>
           <FormControl>
             <FormLabel>Last name</FormLabel>
             <Input
@@ -121,7 +114,7 @@ const Profile = () => {
             />
           </FormControl>
         </Box>
-        <Box w="80%" maxW="400px">
+        <Box w="80%" maxW="400px" mb={4}>
           <FormControl>
             <FormLabel>Email</FormLabel>
             <Input
@@ -135,7 +128,7 @@ const Profile = () => {
             />
           </FormControl>
         </Box>
-        <Box w="80%" maxW="400px">
+        <Box w="80%" maxW="400px" mb={4}>
           <FormControl>
             <FormLabel>Nickname</FormLabel>
             <Input
@@ -149,7 +142,7 @@ const Profile = () => {
             />
           </FormControl>
         </Box>
-        <Box w="80%" maxW="400px">
+        <Box w="80%" maxW="400px" mb={2}>
           <FormControl>
             <FormLabel>Password</FormLabel>
             <Input

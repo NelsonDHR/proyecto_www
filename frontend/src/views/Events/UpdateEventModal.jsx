@@ -53,19 +53,17 @@ const UpdateEventModal = ({ refreshEvents, event,  ...props }) => {
     }
   };
 
-  const [isHovered, setIsHovered] = useState(false);
-
   return (
     <>
-      <Button onClick={onOpen}>Editar evento</Button>
+      <Button onClick={onOpen}>Edit Event</Button>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Editar Evento</ModalHeader>
+        <ModalContent margin="auto">
+          <ModalHeader pb={4}>Edit Event</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <FormControl>
-              <FormLabel>Nombre del evento</FormLabel>
+            <FormControl mb={4}>
+              <FormLabel>Name of the event</FormLabel>
               <Input
                 type="text"
                 name="name"
@@ -73,8 +71,8 @@ const UpdateEventModal = ({ refreshEvents, event,  ...props }) => {
                 onChange={handleChange}
               />
             </FormControl>
-            <FormControl>
-              <FormLabel>Descripción del evento</FormLabel>
+            <FormControl mb={4}>
+              <FormLabel>Description of the event</FormLabel>
               <Input
                 type="text"
                 name="description"
@@ -82,37 +80,28 @@ const UpdateEventModal = ({ refreshEvents, event,  ...props }) => {
                 onChange={handleChange}
               />
             </FormControl>
-            <FormControl>
-              <FormLabel>Tipo de Evento</FormLabel>
+            <FormControl mb={4}>
+              <FormLabel>Type of event</FormLabel>
               <Select
                 name="event_type"
                 value={eventData.event_type}
                 onChange={handleChange}
               >
-                <option value="">Selecciona un tipo de evento</option>
-                <option value="TR">Viaje</option>
-                <option value="HM">Hogar</option>
-                <option value="PR">Pareja</option>
-                <option value="FD">Comida</option>
-                <option value="OT">Otro</option>
+                <option value="">Select a type of event</option>
+                <option value="TR">Travel</option>
+                <option value="HM">Home</option>
+                <option value="PR">Couple</option>
+                <option value="FD">Food</option>
+                <option value="OT">Other</option>
               </Select>
             </FormControl>
-{/*             <FormControl>
-              <FormLabel>Participante actividad</FormLabel>
-              <Input
-                type="number"
-                name="participants"
-                value={activityData.participants}
-                onChange={handleChange}
-              />
-            </FormControl> */}
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={onClose}>
-              Cancelar
+              Cancel
             </Button>
             <Button colorScheme="green" onClick={handleSubmit}>
-              Actualizar
+              Update
             </Button>
           </ModalFooter>
         </ModalContent>

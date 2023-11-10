@@ -11,26 +11,16 @@ import {
   Flex,
   Stack,
   Center,
-  Box,
   useColorMode,
 } from "@chakra-ui/react";
-import { AddIcon } from "@chakra-ui/icons";
 import { getAllEvents } from "../../api/event.api";
 import { useDisclosure } from "@chakra-ui/hooks";
 import AddEventModal from "./AddEventModal";
 import UpdateEventModal from "./UpdateEventModal";
-import Navbar from "../../components/Navbar";
-import { Link } from "react-router-dom";
 
-const Events = () => {
-  const { colorMode } = useColorMode();
+const Events = ({selectedOption, handleOptionClick}) => {
   const [events, setEvents] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [selectedOption, setSelectedOption] = useState("event");
-
-  const handleOptionClick = (option) => {
-    setSelectedOption(option);
-  };
 
   useEffect(() => {
     async function loadEvents() {
@@ -51,18 +41,6 @@ const Events = () => {
   };
 
   return (
-    <Box
-      w="100vw"
-      h="100vh"
-      display="flex"
-      flexDirection="column"
-      overflow="hidden"
-      bg={colorMode === "light" ? "gray.200" : "gray.800"}
-    >
-      <Navbar
-        selectedOption={selectedOption}
-        handleOptionClick={handleOptionClick}
-      />
       <Flex
         alignItems="center"
         justifyContent="center"
@@ -83,9 +61,9 @@ const Events = () => {
               <Center>
                 <CardFooter>
                   <Stack direction="column" spacing={2}>
-                    <Link to="/activities">
-                      <Button size="md">Ver actividades</Button>
-                    </Link>
+                      <Button size="md" onClick={() => handleOptionClick('activities')}>
+                        Activities
+                      </Button>
                     <UpdateEventModal
                       isOpen={isOpen}
                       onClose={onClose}
@@ -105,7 +83,6 @@ const Events = () => {
           updateEvents={updateEvents}
         />
       </Flex>
-    </Box>
   );
 };
 
