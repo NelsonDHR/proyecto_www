@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
+  Center,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -303,6 +304,7 @@ const SignUp = () => {
                       </FormControl>
                     )}
                   </Field>
+                  <Center>
                   <Button
                     type="submit"
                     colorScheme="blue"
@@ -311,6 +313,7 @@ const SignUp = () => {
                   >
                     Sign Up
                   </Button>
+                  </Center>
                 </Form>
               )}
             </Formik>

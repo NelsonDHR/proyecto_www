@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// const url = import.meta.env.VITE_BACKEND_URL_LOCAL + "/splitcount/api/event/";
-const url = import.meta.env.VITE_BACKEND_URL_PROD + "/splitcount/api/event/";
+const url = import.meta.env.VITE_BACKEND_URL_LOCAL + "/splitcount/api/event/";
+// const url = import.meta.env.VITE_BACKEND_URL_PROD + "/splitcount/api/event/";
 
 const getConfig = () => ({
   headers: {
@@ -21,3 +21,8 @@ export const putEvent = (id_event, event) => {
   const urlId = `${url}${id_event}/`;
   return axios.put(urlId, event, getConfig());
 };
+
+export const inactivateEvent = (id_event,event) => {
+  const urlId = `${url}${id_event}/`;
+  return axios.delete(urlId,getConfig());
+}
