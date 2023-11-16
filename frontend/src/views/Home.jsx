@@ -55,6 +55,14 @@ const Home = () => {
     }
   };
 
+  const handleAccountDeletion = () => {
+    setIsLoading(true);
+    setMessage('Deleting account...');
+    setTimeout(() => {
+      navigateTo('/sign-up');
+    }, 3000);
+  };
+
   return (
     <Box
       w="100vw"
@@ -83,7 +91,7 @@ const Home = () => {
         />
       )}
       {!isLoading && selectedOption === 'events' && <Events handleOptionClick={handleOptionClick} />}      {!isLoading && selectedOption === 'contacts' && <ContactsView />}
-      {!isLoading && selectedOption === 'profile' && <Profile />}
+      {!isLoading && selectedOption === 'profile' && <Profile onAccountDeletion={handleAccountDeletion} />}
       {!isLoading && selectedOption === 'activities' && <Activities />}
     </Box>
   );
