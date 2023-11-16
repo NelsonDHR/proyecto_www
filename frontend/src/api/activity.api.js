@@ -23,3 +23,8 @@ export const putActivity = (id_activity, activity) => {
   const urlId = `${url}${id_activity}/`;
   return axios.put(urlId, activity, getConfig());
 };
+
+export const inactivateActivity = (id_activity) => {
+  const urlId = `${url}${id_activity}/`;
+  return axios.delete(urlId, getConfig());
+};

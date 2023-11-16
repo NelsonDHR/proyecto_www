@@ -116,11 +116,6 @@ class EventView(viewsets.ModelViewSet):
 class ActivityView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ActivitySerializer
-    # def get_queryset(self):
-    #     user = self.request.user
-    #     id = self.request.query_params.get('id', None)
-    #     queryset = Activity.objects.filter((Q(creator=user) | Q(participants=user)) & Q(is_active=True) & Q(event=id))
-    #     return queryset
     def get_queryset(self):
         user = self.request.user
         queryset = Activity.objects.filter(Q(creator=user) | Q(participants=user) & Q(is_active=True))
@@ -136,7 +131,6 @@ class ActivityView(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         request_data = request.data.copy()
         request_data["creator"] = request.user.id
-        #request_data["event"] = request.event.id
         
         serializer = self.get_serializer(data=request_data)
         # print("AVer",serializer)
