@@ -15,18 +15,19 @@ import AddActivityModal from "./AddActivityModal";
 import UpdateActivityModal from "./UpdateActivityModal";
 import { useParams } from "react-router-dom";
 
-const Activity = () => {
+const Activity = ({event}) => {
   const [activity, setActivity] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { eventId } = useParams();
 
   useEffect(() => {
-    async function loadActivity() {
-      const res = await getAllActivities(eventId);
+    async function loadActivity(event) {
+      const res = await getAllActivities(event);
       setActivity(res.data);
     }
-    loadActivity();
-  }, [eventId]);
+    loadActivity(event);
+    //console.log("Dentro actividad", event)
+  }, [event]);
 
   const updateActivity = (newActivity) => {
     setActivity([...activity, newActivity]);

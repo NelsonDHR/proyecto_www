@@ -114,8 +114,15 @@ class EventView(viewsets.ModelViewSet):
 
 
 class ActivityView(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
     serializer_class = ActivitySerializer
-    queryset = Activity.objects.all()
+    def get_queryset(self):
+        user = self.request.user
+        id = self.request.query_params.get('id', None)
+        #print("DKKKKKKK", id)
+        queryset = Activity.objects.filter((Q(creator=user) | Q(participants=user)) & Q(is_active=True) & Q(event=id))
+        return queryset
+    
 
 
 class UserDetailView(generics.RetrieveAPIView):

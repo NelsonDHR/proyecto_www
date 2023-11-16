@@ -9,8 +9,10 @@ const getConfig = () => ({
   },
 });
 
-export const getAllActivities = () => {
-  return axios.get(url, getConfig());
+export const getAllActivities = (event) => {
+  console.log("event",event)
+  return axios.get(url, {...getConfig(), 
+  params: event});
 };
 
 export const createActivity = (activity) => {
