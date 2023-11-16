@@ -27,7 +27,7 @@ const AddActivityModal = ({ updateActivity, ...props }) => {
     name: "",
     description: "",
     value: "",
-    event: "",
+    event: props.event.id,
     participants: "",
     is_active: true,
   });
@@ -43,6 +43,7 @@ const AddActivityModal = ({ updateActivity, ...props }) => {
 
   const handleSubmit = async () => {
     try {
+      console.log("DATA", activityData)
       // Llama a la función de la API para crear el activityo
       const newActivity = await createActivity(activityData);
       // Actualiza la lista de activities en el componente padre
@@ -108,15 +109,7 @@ const AddActivityModal = ({ updateActivity, ...props }) => {
                 borderRadius: '24px',
               }
             }}>
-            <FormControl mb={4}>
-              <FormLabel>Creator</FormLabel>
-              <Input
-                type="text"
-                name="creator"
-                value={activityData.creator}
-                onChange={handleChange}
-              />
-            </FormControl>
+            
             <FormControl mb={4}>
               <FormLabel>Name of the activity</FormLabel>
               <Input
@@ -127,7 +120,7 @@ const AddActivityModal = ({ updateActivity, ...props }) => {
               />
             </FormControl>
             <FormControl mb={4}>
-              <FormLabel>Event description</FormLabel>
+              <FormLabel>Activity description</FormLabel>
               <Input
                 type="text"
                 name="description"
@@ -144,15 +137,7 @@ const AddActivityModal = ({ updateActivity, ...props }) => {
                 onChange={handleChange}
               />
             </FormControl>
-            <FormControl mb={4}>
-              <FormLabel>Event of the activity</FormLabel>
-              <Input
-                type="number"
-                name="event"
-                value={activityData.event}
-                onChange={handleChange}
-              />
-            </FormControl>
+            
             <FormControl mb={4}>
               <FormLabel>Participants of the activity</FormLabel>
               <Input

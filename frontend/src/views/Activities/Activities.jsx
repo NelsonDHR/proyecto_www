@@ -71,6 +71,7 @@ const Activity = ({event}) => {
         isOpen={isOpen}
         onClose={onClose}
         updateActivity={updateActivity}
+        event={event}
       />
     </Flex>
   );

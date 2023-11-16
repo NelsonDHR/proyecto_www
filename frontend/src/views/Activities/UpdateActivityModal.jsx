@@ -15,7 +15,7 @@ import {
 } from "@chakra-ui/react";
 import { putActivity } from "../../api/activity.api";
 
-const UpdateActivityModal = ({ refreshActivity, activity,  ...props }) => {
+const UpdateActivityModal = ({ refreshActivity, activity, ...props }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [activityData, setActivityData] = useState({
     creator: activity.creator,
@@ -63,27 +63,18 @@ const UpdateActivityModal = ({ refreshActivity, activity,  ...props }) => {
             maxH="400px"
             overflowY="scroll"
             css={{
-              '&::-webkit-scrollbar': {
-                width: '4px',
+              "&::-webkit-scrollbar": {
+                width: "4px",
               },
-              '&::-webkit-scrollbar-track': {
-                width: '6px',
+              "&::-webkit-scrollbar-track": {
+                width: "6px",
               },
-              '&::-webkit-scrollbar-thumb': {
-                background: 'gray',
-                borderRadius: '24px',
-              }
-            }}>
-            <FormControl mb={4}>
-              <FormLabel>Creator</FormLabel>
-              <Input
-                type="text"
-                name="creator"
-                value={activityData.creator}
-                onChange={handleChange}
-                readOnly
-              />
-            </FormControl>
+              "&::-webkit-scrollbar-thumb": {
+                background: "gray",
+                borderRadius: "24px",
+              },
+            }}
+          >
             <FormControl mb={4}>
               <FormLabel>Name of the activity</FormLabel>
               <Input
@@ -111,16 +102,7 @@ const UpdateActivityModal = ({ refreshActivity, activity,  ...props }) => {
                 onChange={handleChange}
               />
             </FormControl>
-            <FormControl mb={4}>
-              <FormLabel>Event of the activity</FormLabel>
-              <Input
-                type="number"
-                name="event"
-                value={activityData.event}
-                onChange={handleChange}
-                readOnly
-              />
-            </FormControl>
+
             <FormControl mb={4}>
               <FormLabel>Participants of the activity</FormLabel>
               <Input
