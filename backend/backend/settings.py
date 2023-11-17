@@ -100,6 +100,7 @@ DATABASES = {
     }
 }
 
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

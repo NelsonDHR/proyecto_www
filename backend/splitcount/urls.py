@@ -2,6 +2,8 @@ from django.urls import path, include
 from rest_framework import routers
 from .views import *
 
+app_name = 'splitcount'
+
 router = routers.DefaultRouter()
 router.register(r'event', EventView, 'event')
 router.register(r'activities', ActivityView, 'activities')
