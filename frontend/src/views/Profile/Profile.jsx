@@ -1,21 +1,27 @@
 import React from "react";
 import {
   Box,
-  useColorMode,
+  Button,
+  Flex,
   FormControl,
   FormLabel,
-  Input,
-  Button,
   Heading,
-  Flex,
+  Input,
+  useColorMode,
+  useToast,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
-import { getUser, updateUser } from "../../api/profile.api";
+import { getUser, updateUser, deleteUser } from "../../api/profile.api";
+import DeleteAccountModal from "./DeleteAccountModal";
 
-const Profile = () => {
-  const { colorMode } = useColorMode();
+const Profile = ({ onAccountDeletion }) => {
+  const colorMode = useColorMode();
+  const toast = useToast();
 
-  const [selectedOption, setSelectedOption] = useState("profile");
+  const cancelRef = React.useRef();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const onClose = () => setIsOpen(false);
   const [isEditable, setIsEditable] = useState(false);
   const [defaultData, setDefaultData] = useState({
     email: "",
@@ -44,8 +50,19 @@ const Profile = () => {
     console.log(dataUser);
   };
 
-  const handleOptionClick = (option) => {
-    setSelectedOption(option);
+  const handleDelete = async () => {
+    // Close confirmation modal
+    onClose();
+    try {
+      const response = await deleteUser();
+      localStorage.removeItem("token");
+      setIsDeleting(true);
+      console.log(response.data);
+      onAccountDeletion(); // Redirect function
+    } catch (error) {
+      setIsDeleting(false);
+      console.error('Error al eliminar la cuenta:', error.response.data);
+    }
   };
 
   const handleEdit = () => {
@@ -56,8 +73,23 @@ const Profile = () => {
     // Enviar actualización a la bd, uso de API.
     setIsEditable(false);
     try {
-      const newUpdateUser = await updateUser(dataUser);
+      const response = await updateUser(dataUser);
+      console.log(response);
+      toast({
+        title: "Changes saved.",
+        description: `You have succesfully updated your profile.`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
     } catch (error) {
+      toast({
+        title: "Error at updating profile.",
+        description: "An error occurred while trying to update your profile. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
       console.error("Error al actualizar usuario:", error);
     }
   };
@@ -68,110 +100,93 @@ const Profile = () => {
   };
 
   return (
-    <Box
-      w="100vw"
-      h="100vh"
-      display="flex"
-      flexDirection="column"
-      overflow="hidden"
-      bg={colorMode === "light" ? "gray.200" : "gray.800"}
-    >
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        justifyContent="center"
-        flex="1" // Para ocupar el espacio restante en el contenedor principal
-      >
-        <Heading as="h1" size="lg" mb={6}>
-          Hey you! This is your profile.
-        </Heading>
-        <Box w="80%" maxW="400px" mb={4}>
-          <FormControl>
-            <FormLabel>First name</FormLabel>
-            <Input
-              bg={colorMode === "light" ? "white" : "gray.700"}
-              color={colorMode === "light" ? "gray.800" : "white"}
-              type="text"
-              name="first_name"
-              value={dataUser.first_name}
-              isReadOnly={!isEditable}
-              onChange={handleChange}
-            />
-          </FormControl>
-        </Box>
-        <Box w="80%" maxW="400px" mb={4}>
-          <FormControl>
-            <FormLabel>Last name</FormLabel>
-            <Input
-              bg={colorMode === "light" ? "white" : "gray.700"}
-              color={colorMode === "light" ? "gray.800" : "white"}
-              type="text"
-              name="last_name"
-              value={dataUser.last_name}
-              isReadOnly={!isEditable}
-              onChange={handleChange}
-            />
-          </FormControl>
-        </Box>
-        <Box w="80%" maxW="400px" mb={4}>
-          <FormControl>
-            <FormLabel>Email</FormLabel>
-            <Input
-              bg={colorMode === "light" ? "white" : "gray.700"}
-              color={colorMode === "light" ? "gray.800" : "white"}
-              type="text"
-              name="email"
-              value={dataUser.email}
-              isReadOnly={!isEditable}
-              onChange={handleChange}
-            />
-          </FormControl>
-        </Box>
-        <Box w="80%" maxW="400px" mb={4}>
-          <FormControl>
-            <FormLabel>Nickname</FormLabel>
-            <Input
-              bg={colorMode === "light" ? "white" : "gray.700"}
-              color={colorMode === "light" ? "gray.800" : "white"}
-              type="text"
-              name="nickname"
-              value={dataUser.nickname}
-              isReadOnly={!isEditable}
-              onChange={handleChange}
-            />
-          </FormControl>
-        </Box>
-        <Box w="80%" maxW="400px" mb={2}>
-          <FormControl>
-            <FormLabel>Password</FormLabel>
-            <Input
-              bg={colorMode === "light" ? "white" : "gray.700"}
-              color={colorMode === "light" ? "gray.800" : "white"}
-              type="text"
-              name="password"
-              value={dataUser.password}
-              isReadOnly={!isEditable}
-              onChange={handleChange}
-            />
-          </FormControl>
-        </Box>
+    <Flex direction="column" alignItems="center" justifyContent="flex-start" height="100vh" p={4}>
+      <Heading as="h1" size="lg" mt={2} mb={2}>
+        {defaultData.nickname}'s Profile
+      </Heading>
+      <Box w="80%" maxW="400px" mb={4}>
+        <FormControl mb={4}>
+          <FormLabel>First name</FormLabel>
+          <Input
+            bg={colorMode === "light" ? "white" : "gray.700"}
+            color={colorMode === "light" ? "gray.800" : "white"}
+            type="text"
+            name="first_name"
+            value={dataUser.first_name}
+            isReadOnly={!isEditable}
+            onChange={handleChange}
+          />
+        </FormControl>
+        <FormControl mb={4}>
+          <FormLabel>Last name</FormLabel>
+          <Input
+            bg={colorMode === "light" ? "white" : "gray.700"}
+            color={colorMode === "light" ? "gray.800" : "white"}
+            type="text"
+            name="last_name"
+            value={dataUser.last_name}
+            isReadOnly={!isEditable}
+            onChange={handleChange}
+          />
+        </FormControl>
+        <FormControl mb={4}>
+          <FormLabel>Email</FormLabel>
+          <Input
+            bg={colorMode === "light" ? "white" : "gray.700"}
+            color={colorMode === "light" ? "gray.800" : "white"}
+            type="text"
+            name="email"
+            value={dataUser.email}
+            isReadOnly={!isEditable}
+            onChange={handleChange}
+          />
+        </FormControl>
+        <FormControl mb={4}>
+          <FormLabel>Nickname</FormLabel>
+          <Input
+            bg={colorMode === "light" ? "white" : "gray.700"}
+            color={colorMode === "light" ? "gray.800" : "white"}
+            type="text"
+            name="nickname"
+            value={dataUser.nickname}
+            isReadOnly={!isEditable}
+            onChange={handleChange}
+          />
+        </FormControl>
+        <FormControl>
+          <FormLabel>Password</FormLabel>
+          <Input
+            bg={colorMode === "light" ? "white" : "gray.700"}
+            color={colorMode === "light" ? "gray.800" : "white"}
+            type="text"
+            name="password"
+            value={dataUser.password}
+            isReadOnly={!isEditable}
+            onChange={handleChange}
+          />
+        </FormControl>
         {isEditable ? (
-          <Flex>
-            <Button mt="4" mr="2" colorScheme="green" onClick={handleUpdate}>
+          <Flex mt={6}>
+            <Button mr={2} colorScheme="green" onClick={handleUpdate}>
               Update
             </Button>
-            <Button mt="4" colorScheme="red" onClick={handleCancel}>
+            <Button colorScheme="red" onClick={handleCancel}>
               Cancel
             </Button>
           </Flex>
         ) : (
-          <Button mt="4" colorScheme="green" onClick={handleEdit}>
-            Edit
-          </Button>
+          <Flex mt={6}>
+            <Button colorScheme="green" onClick={handleEdit}>
+              Edit Profile
+            </Button>
+            <Button ml={4} colorScheme="red" onClick={() => setIsOpen(true)}>
+              Delete Account
+            </Button>
+            <DeleteAccountModal isOpen={isOpen} onClose={onClose} handleDelete={handleDelete} cancelRef={cancelRef} />
+          </Flex>
         )}
       </Box>
-    </Box>
+    </Flex>
   );
 };
 

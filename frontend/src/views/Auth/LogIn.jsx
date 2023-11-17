@@ -27,7 +27,7 @@ const LogInSchema = Yup.object().shape({
 
 const LogIn = () => {
   const { colorMode } = useColorMode();
-  const [error, setError] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [message, setMessage] = useState('');
@@ -59,7 +59,17 @@ const LogIn = () => {
       console.log(response.data);
     } catch (error) {
       setIsSuccess(false);
-      setError(error.response.data.error);
+      let errorMessage = '';
+      if (error.response.data.email) {
+        errorMessage = error.response.data.email[0];
+      } else if (error.response.data.non_field_errors) {
+        errorMessage = error.response.data.non_field_errors[0];
+      } else if (error.response.data.detail) {
+        errorMessage = error.response.data.detail;
+      } else {
+        errorMessage = 'An unknown error occurred.';
+      }
+      setErrorMessage(errorMessage);
       console.error('Error al iniciar sesión:', error.response.data);
     } finally {
       actions.setSubmitting(false);
@@ -71,6 +81,7 @@ const LogIn = () => {
       w="100vw"
       h="100vh"
       display="flex"
+      flexDirection="column"
       justifyContent="center"
       alignItems="center"
       bg={colorMode == 'light' ? 'gray.100' : 'gray.900'}
@@ -142,11 +153,6 @@ const LogIn = () => {
                     </FormControl>
                   )}
                 </Field>
-                {error && (
-                  <Box mb="4" color="red.500">
-                    {error}
-                  </Box>
-                )}
                 <Button
                   type="submit"
                   colorScheme="blue"
@@ -161,6 +167,19 @@ const LogIn = () => {
           <Link mt="4" onClick={() => navigateTo('/sign-up')}>Don't have an account? Sign up here.</Link>
         </Box>
       )}
+      <Box
+        bg={isSuccess ? 'green.100' : 'red.100'}
+        color={isSuccess ? 'green.800' : 'red.800'}
+        p="2"
+        mt="6"
+        mb="0"
+        rounded="md"
+        border="1px solid"
+        borderColor={isSuccess ? 'green.200' : 'red.200'}
+        hidden={!errorMessage || isLoading}
+      >
+        {errorMessage}
+      </Box>
     </Box>
   );
 };

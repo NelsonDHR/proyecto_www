@@ -162,6 +162,12 @@ class UserDetailView(generics.RetrieveAPIView):
         # Obtiene el objeto de usuario que se está actualizando
         user = self.get_object()
 
+        # Si 'is_active' está en los datos de la solicitud, actualiza el estado de actividad del usuario
+        if 'is_active' in request.data:
+            user.is_active = request.data['is_active']
+            user.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
         # Actualiza los datos del usuario con los datos de la solicitud
         serializer = self.get_serializer(user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
