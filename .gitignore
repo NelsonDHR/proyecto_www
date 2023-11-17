@@ -24,6 +24,7 @@ yarn-error.log*
 
 # Python virtual environment
 env/
+/backend/venv/
 
 # IDEs and editors
 .vscode/
