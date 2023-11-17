@@ -20,7 +20,7 @@ import UpdateEventModal from "./UpdateEventModal";
 import { getAllContacts } from "../../api/contacts.api";
 import DeleteEventModal from "./DeleteEventModal";
 
-const Events = ({ selectedOption, handleOptionClick, handleActivityEvent }) => {
+const Events = ({selectedOption, handleOptionClick, handleActivityEvent}) => {
   const [events, setEvents] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [contacts, setContacts] = useState([]);
@@ -86,16 +86,26 @@ const Events = ({ selectedOption, handleOptionClick, handleActivityEvent }) => {
               <Center>
                 <CardFooter>
                   <Stack direction="column" spacing={2}>
-                      <Button size="md" onClick={() => handleOptionClick('activities')}>
+                      <Button size="md" onClick={() => handleActivitiesClick(event)}>
                         Activities
                       </Button>
                     <UpdateEventModal
                       isOpen={isOpen}
                       onClose={onClose}
                       refreshEvents={refreshEvents}
+                      contacts={contacts}
                       event={event}
                       index={index}
                     />
+                      <DeleteEventModal
+                      isOpen={isOpen}
+                      onClose={onClose}
+                      deleteEvents={(index) => deleteEvents(index)}
+                      event={event}
+                      index={index}
+                      updateEvents={updateEvents}
+                      />
+                     
                   </Stack>
                 </CardFooter>
               </Center>
