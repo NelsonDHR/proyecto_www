@@ -34,10 +34,10 @@ FRONTEND_URL_LOCAL = os.getenv('FRONTEND_URL_LOCAL')
 FRONTEND_URL_PROD = os.getenv('FRONTEND_URL_PROD')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-# ALLOWED_HOSTS = ['splitcount.fly.dev', 'www.splitcount.fly.dev']
-ALLOWED_HOSTS = ['splitcount.fly.dev', 'www.splitcount.fly.dev', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['splitcount.fly.dev', 'www.splitcount.fly.dev']
+# ALLOWED_HOSTS = ['splitcount.fly.dev', 'www.splitcount.fly.dev', 'localhost', '127.0.0.1']
 
 # Application definition
 
