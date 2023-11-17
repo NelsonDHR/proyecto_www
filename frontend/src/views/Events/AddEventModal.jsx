@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDisclosure } from "@chakra-ui/hooks";
 import {
   Modal,
@@ -13,10 +13,20 @@ import {
   FormLabel,
   Input,
   Select,
-  Text
+  Text,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Center,
+  VStack,
+  TagLabel,
+  Tag,
+  TagCloseButton
 } from "@chakra-ui/react";
- import { createEvent } from '../../api/event.api';
 import { CalendarIcon } from '@chakra-ui/icons';
+import { getAllContacts } from '../../api/contacts.api'; 
+import { createEvent } from '../../api/event.api';
 
 const AddEventModal = ({ updateEvents, ...props }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -29,6 +39,22 @@ const AddEventModal = ({ updateEvents, ...props }) => {
     creator: 1,
     participants: []
   });
+  const [contacts, setContacts] = useState([]);
+
+  useEffect(() => {
+    // Cargar contactos cuando se abre el modal
+    loadContacts();
+  }, []);
+
+  const loadContacts = async () => {
+    try {
+      const response = await getAllContacts();
+      setContacts(response.data);
+      console.log(contacts)
+    } catch (error) {
+      console.error("Error loading contacts:", error);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -37,6 +63,20 @@ const AddEventModal = ({ updateEvents, ...props }) => {
       [name]: value,
     });
     console.log(eventData)
+  };
+
+  const handleContactsChange = (selectedContacts) => {
+    const uniqueContacts = Array.from(new Set(selectedContacts));
+    setEventData((prevData) => ({
+      ...prevData,
+      participants: uniqueContacts,
+    }));
+  };
+  const handleRemoveContact = (contactId) => {
+    setEventData((prevData) => ({
+      ...prevData,
+      participants: prevData.participants.filter((id) => id !== contactId),
+    }));
   };
 
   const handleSubmit = async () => {
@@ -121,6 +161,34 @@ const AddEventModal = ({ updateEvents, ...props }) => {
                 <option value="OT">Other</option>
               </Select>
             </FormControl>
+            <FormControl mb={4}>
+              <FormLabel>Participants</FormLabel>
+              <Center>
+              <Menu>
+                <MenuButton as={Button}>
+                  Select participants
+                </MenuButton>
+                <MenuList>
+                  {contacts.map((contact) => (
+                    <MenuItem
+                      key={contact.id}
+                      onClick={() => handleContactsChange([...eventData.participants, contact.id])}
+                    >
+                      {contact.nickname}
+                    </MenuItem>
+                  ))}
+                </MenuList>
+              </Menu>
+              </Center>
+            </FormControl>
+             <VStack align="flex-start" spacing={2}>
+              {eventData.participants.map((contactId) => (
+                <Tag key={contactId} size="lg" colorScheme="teal">
+                  <TagLabel>{contacts.find((contact) => contact.id === contactId)?.nickname}</TagLabel>
+                  <TagCloseButton onClick={() => handleRemoveContact(contactId)} />
+                </Tag>
+              ))}
+            </VStack> 
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={onClose}>
