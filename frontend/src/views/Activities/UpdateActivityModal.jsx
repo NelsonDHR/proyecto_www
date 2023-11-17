@@ -12,10 +12,20 @@ import {
   FormControl,
   FormLabel,
   Input,
+  Select,
+  VStack,
+  Tag,
+  TagLabel,
+  TagCloseButton,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Center,
 } from "@chakra-ui/react";
 import { putActivity } from "../../api/activity.api";
 
-const UpdateActivityModal = ({ refreshActivity, activity, ...props }) => {
+const UpdateActivityModal = ({ refreshActivity, activity, contacts, ...props }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [activityData, setActivityData] = useState({
     creator: activity.creator,
@@ -51,6 +61,22 @@ const UpdateActivityModal = ({ refreshActivity, activity, ...props }) => {
     }
   };
 
+  const handleRemoveContact = (contactId) => {
+    setActivityData((prevData) => ({
+      ...prevData,
+      participants: prevData.participants.filter((id) => id !== contactId),
+    }));
+  };
+
+  const handleContactsChange = (selectedContacts) => {
+    const uniqueContacts = Array.from(new Set(selectedContacts));
+    setActivityData((prevData) => ({
+      ...prevData,
+      participants: uniqueContacts,
+    }));
+  };
+
+
   return (
     <>
       <Button onClick={onOpen}>Edit Activity</Button>
@@ -85,7 +111,7 @@ const UpdateActivityModal = ({ refreshActivity, activity, ...props }) => {
               />
             </FormControl>
             <FormControl mb={4}>
-              <FormLabel>Event description</FormLabel>
+              <FormLabel>Activity description</FormLabel>
               <Input
                 type="text"
                 name="description"
@@ -102,16 +128,34 @@ const UpdateActivityModal = ({ refreshActivity, activity, ...props }) => {
                 onChange={handleChange}
               />
             </FormControl>
-
             <FormControl mb={4}>
               <FormLabel>Participants of the activity</FormLabel>
-              <Input
-                type="number"
-                name="participants"
-                value={activityData.participants}
-                onChange={handleChange}
-              />
+              <Center>
+              <Menu>
+                <MenuButton as={Button}>
+                  Select participants
+                </MenuButton>
+                <MenuList>
+                  {contacts.map((contact) => (
+                    <MenuItem
+                      key={contact.id}
+                      onClick={() => handleContactsChange([...activityData.participants, contact.id])}
+                    >
+                      {contact.nickname}
+                    </MenuItem>
+                  ))}
+                </MenuList>
+              </Menu>
+              </Center>
             </FormControl>
+            <VStack align="flex-start" spacing={2}>
+              {activityData.participants.map((contactId) => (
+                <Tag key={contactId} size="lg" colorScheme="teal">
+                  <TagLabel>{contacts.find((contact) => contact.id === contactId)?.nickname}</TagLabel>
+                  <TagCloseButton onClick={() => handleRemoveContact(contactId)} />
+                </Tag>
+              ))}
+            </VStack> 
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={onClose}>

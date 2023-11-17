@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDisclosure } from "@chakra-ui/hooks";
 import {
   Modal,
@@ -15,12 +15,23 @@ import {
   Input,
   Icon,
   Text,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Center,
+  VStack,
+  TagLabel,
+  Tag,
+  TagCloseButton,
 } from "@chakra-ui/react";
 import { createActivity } from "../../api/activity.api";
 import { RxActivityLog } from "react-icons/rx";
+import { getAllContacts } from "../../api/contacts.api";
 
 const AddActivityModal = ({ updateActivity, ...props }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [contacts, setContacts] = useState([]);
   const [activityData, setActivityData] = useState({
     creator: "",
     avatar: null,
@@ -28,9 +39,37 @@ const AddActivityModal = ({ updateActivity, ...props }) => {
     description: "",
     value: "",
     event: props.event.id,
-    participants: "",
+    participants: [],
     is_active: true,
   });
+
+  useEffect(() => {
+    // Cargar contactos cuando se abre el modal
+    loadContacts();
+  }, []);
+
+  const loadContacts = async () => {
+    try {
+      const response = await getAllContacts();
+      setContacts(response.data);
+      console.log(contacts);
+    } catch (error) {
+      console.error("Error loading contacts:", error);
+    }
+  };
+  const handleContactsChange = (selectedContacts) => {
+    const uniqueContacts = Array.from(new Set(selectedContacts));
+    setActivityData((prevData) => ({
+      ...prevData,
+      participants: uniqueContacts,
+    }));
+  };
+  const handleRemoveContact = (contactId) => {
+    setActivityData((prevData) => ({
+      ...prevData,
+      participants: prevData.participants.filter((id) => id !== contactId),
+    }));
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -43,7 +82,7 @@ const AddActivityModal = ({ updateActivity, ...props }) => {
 
   const handleSubmit = async () => {
     try {
-      console.log("DATA", activityData)
+      // console.log("DATA", activityData)
       // Llama a la función de la API para crear el activityo
       const newActivity = await createActivity(activityData);
       // Actualiza la lista de activities en el componente padre
@@ -98,18 +137,18 @@ const AddActivityModal = ({ updateActivity, ...props }) => {
             maxH="400px"
             overflowY="scroll"
             css={{
-              '&::-webkit-scrollbar': {
-                width: '4px',
+              "&::-webkit-scrollbar": {
+                width: "4px",
               },
-              '&::-webkit-scrollbar-track': {
-                width: '6px',
+              "&::-webkit-scrollbar-track": {
+                width: "6px",
               },
-              '&::-webkit-scrollbar-thumb': {
-                background: 'gray',
-                borderRadius: '24px',
-              }
-            }}>
-            
+              "&::-webkit-scrollbar-thumb": {
+                background: "gray",
+                borderRadius: "24px",
+              },
+            }}
+          >
             <FormControl mb={4}>
               <FormLabel>Name of the activity</FormLabel>
               <Input
@@ -137,16 +176,45 @@ const AddActivityModal = ({ updateActivity, ...props }) => {
                 onChange={handleChange}
               />
             </FormControl>
-            
+
             <FormControl mb={4}>
-              <FormLabel>Participants of the activity</FormLabel>
-              <Input
-                type="number"
-                name="participants"
-                value={activityData.participants}
-                onChange={handleChange}
-              />
+              <FormLabel>Participants</FormLabel>
+              <Center>
+                <Menu>
+                  <MenuButton as={Button}>Select participants</MenuButton>
+                  <MenuList>
+                    {contacts.map((contact) => (
+                      <MenuItem
+                        key={contact.id}
+                        onClick={() =>
+                          handleContactsChange([
+                            ...activityData.participants,
+                            contact.id,
+                          ])
+                        }
+                      >
+                        {contact.nickname}
+                      </MenuItem>
+                    ))}
+                  </MenuList>
+                </Menu>
+              </Center>
             </FormControl>
+            <VStack align="flex-start" spacing={2}>
+              {activityData.participants.map((contactId) => (
+                <Tag key={contactId} size="lg" colorScheme="teal">
+                  <TagLabel>
+                    {
+                      contacts.find((contact) => contact.id === contactId)
+                        ?.nickname
+                    }
+                  </TagLabel>
+                  <TagCloseButton
+                    onClick={() => handleRemoveContact(contactId)}
+                  />
+                </Tag>
+              ))}
+            </VStack>
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={onClose}>

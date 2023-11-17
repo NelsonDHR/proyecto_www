@@ -17,10 +17,12 @@ import AddActivityModal from "./AddActivityModal";
 import UpdateActivityModal from "./UpdateActivityModal";
 import DeleteActivityModal from "./DeletActivityModal";
 import { useParams } from "react-router-dom";
+import { getAllContacts } from "../../api/contacts.api";
 
 const Activity = ({ event }) => {
   const [activity, setActivity] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [contacts, setContacts] = useState([]);
   const { eventId } = useParams();
 
   useEffect(() => {
@@ -29,6 +31,7 @@ const Activity = ({ event }) => {
       setActivity(res.data);
     }
     loadActivity(event);
+    loadContacts()
     //console.log("Dentro actividad", event)
   }, [event]);
 
@@ -46,6 +49,15 @@ const Activity = ({ event }) => {
     const updateActivity = [...activity];
     updateActivity[index] = newActivity;
     setActivity(updateActivity);
+  };
+  
+  const loadContacts = async () => {
+    try {
+      const response = await getAllContacts();
+      setContacts(response.data);
+    } catch (error) {
+      console.error("Error loading contacts:", error);
+    }
   };
 
   return (
@@ -74,6 +86,7 @@ const Activity = ({ event }) => {
                   <UpdateActivityModal
                     isOpen={isOpen}
                     onClose={onClose}
+                    contacts={contacts}
                     refreshActivity={refreshActivity}
                     activity={activity}
                     index={index}
