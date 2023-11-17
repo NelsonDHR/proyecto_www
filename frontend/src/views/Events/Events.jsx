@@ -20,7 +20,7 @@ import UpdateEventModal from "./UpdateEventModal";
 import { getAllContacts } from "../../api/contacts.api";
 import DeleteEventModal from "./DeleteEventModal";
 
-const Events = ({selectedOption, handleOptionClick}) => {
+const Events = ({selectedOption, handleOptionClick, handleActivityEvent}) => {
   const [events, setEvents] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [contacts, setContacts] = useState([]);
@@ -59,6 +59,12 @@ const Events = ({selectedOption, handleOptionClick}) => {
     }
   };
 
+  const handleActivitiesClick = (event) => {
+    handleOptionClick('activities')
+    handleActivityEvent(event)
+    //console.log("event", event)
+  }
+
   return (
       <Flex
         alignItems="center"
@@ -80,7 +86,7 @@ const Events = ({selectedOption, handleOptionClick}) => {
               <Center>
                 <CardFooter>
                   <Stack direction="column" spacing={2}>
-                      <Button size="md" onClick={() => handleOptionClick('activities')}>
+                      <Button size="md" onClick={() => handleActivitiesClick(event)}>
                         Activities
                       </Button>
                     <UpdateEventModal

@@ -23,7 +23,12 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [message, setMessage] = useState('');
+  const [activityEvent, setActivityEvent] = useState('')
   const navigateTo = useNavigate();
+
+  const handleActivityEvent = (event) =>{
+    setActivityEvent(event);
+  }
 
   const handleOptionClick = (option) => {
     setSelectedOption(option);
@@ -82,9 +87,9 @@ const Home = () => {
           handleLogOut={handleLogOut}
         />
       )}
-      {!isLoading && selectedOption === 'events' && <Events handleOptionClick={handleOptionClick} />}      {!isLoading && selectedOption === 'contacts' && <ContactsView />}
+      {!isLoading && selectedOption === 'events' && <Events handleOptionClick={handleOptionClick} handleActivityEvent={handleActivityEvent}/>}      {!isLoading && selectedOption === 'contacts' && <ContactsView />}
       {!isLoading && selectedOption === 'profile' && <Profile />}
-      {!isLoading && selectedOption === 'activities' && <Activities />}
+      {!isLoading && selectedOption === 'activities' && <Activities event={activityEvent}/>}
     </Box>
   );
 };

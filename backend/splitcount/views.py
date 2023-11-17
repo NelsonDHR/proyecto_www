@@ -114,9 +114,42 @@ class EventView(viewsets.ModelViewSet):
 
 
 class ActivityView(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
     serializer_class = ActivitySerializer
-    queryset = Activity.objects.all()
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Activity.objects.filter(Q(creator=user) | Q(participants=user) & Q(is_active=True))
 
+        if self.action == 'list':
+            id = self.request.query_params.get('id', None)
+            if id is not None:
+                queryset = queryset.filter(event=id)
+
+        return queryset
+
+    
+    def create(self, request, *args, **kwargs):
+        request_data = request.data.copy()
+        request_data["creator"] = request.user.id
+        
+        serializer = self.get_serializer(data=request_data)
+        # print("AVer",serializer)
+        serializer.is_valid(raise_exception=True)
+        activity = serializer.save()
+        
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    def update(self, request, pk=None):
+        
+        activity = self.get_object()
+        serializer = ActivitySerializer(activity, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+  
 
 class UserDetailView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
