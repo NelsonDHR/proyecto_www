@@ -14,6 +14,7 @@ staticfiles/
 node_modules/
 dist/
 *.local
+package-lock.json
 .cache/
 coverage/
 .DS_Store
