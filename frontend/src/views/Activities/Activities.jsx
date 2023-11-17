@@ -8,34 +8,56 @@ import {
   Heading,
   Text,
   Flex,
+  Stack,
+  Center,
 } from "@chakra-ui/react";
 import { getAllActivities } from "../../api/activity.api";
 import { useDisclosure } from "@chakra-ui/hooks";
 import AddActivityModal from "./AddActivityModal";
 import UpdateActivityModal from "./UpdateActivityModal";
+import DeleteActivityModal from "./DeletActivityModal";
 import { useParams } from "react-router-dom";
+import { getAllContacts } from "../../api/contacts.api";
 
-const Activity = () => {
+const Activity = ({ event }) => {
   const [activity, setActivity] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [contacts, setContacts] = useState([]);
   const { eventId } = useParams();
 
   useEffect(() => {
-    async function loadActivity() {
-      const res = await getAllActivities(eventId);
+    async function loadActivity(event) {
+      const res = await getAllActivities(event);
       setActivity(res.data);
     }
-    loadActivity();
-  }, [eventId]);
+    loadActivity(event);
+    loadContacts()
+    //console.log("Dentro actividad", event)
+  }, [event]);
 
   const updateActivity = (newActivity) => {
     setActivity([...activity, newActivity]);
   };
 
+  const deleteActivity = (deleteIndex) => {
+    const updatedActivity = [...activity];
+    updatedActivity.splice(deleteIndex, 1); // Remove the deleted event from the array
+    setActivity(updatedActivity);
+  }
+
   const refreshActivity = (newActivity, index) => {
     const updateActivity = [...activity];
     updateActivity[index] = newActivity;
     setActivity(updateActivity);
+  };
+  
+  const loadContacts = async () => {
+    try {
+      const response = await getAllContacts();
+      setContacts(response.data);
+    } catch (error) {
+      console.error("Error loading contacts:", error);
+    }
   };
 
   return (
@@ -48,21 +70,38 @@ const Activity = () => {
       <SimpleGrid spacing={4} columns={{ base: 1, sm: 2, md: 3, lg: 5 }}>
         {activity.map((activity, index) => (
           <Card key={activity.id}>
-            <CardHeader>
-              <Heading size="md">{activity.name}</Heading>
-            </CardHeader>
-            <CardBody>
-              <Text>{activity.description}</Text>
-            </CardBody>
-            <CardFooter>
-              <UpdateActivityModal
-                isOpen={isOpen}
-                onClose={onClose}
-                refreshActivity={refreshActivity}
-                activity={activity}
-                index={index}
-              />
-            </CardFooter>
+            <Center>
+              <CardHeader>
+                <Heading size="md">{activity.name}</Heading>
+              </CardHeader>
+            </Center>
+            <Center>
+              <CardBody>
+                <Text>{activity.description}</Text>
+              </CardBody>
+            </Center>
+            <Center>
+              <CardFooter>
+                <Stack direction="column" spacing={2}>
+                  <UpdateActivityModal
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    contacts={contacts}
+                    refreshActivity={refreshActivity}
+                    activity={activity}
+                    index={index}
+                  />
+                  <DeleteActivityModal
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    deleteActivity={(index) => deleteActivity(index)}
+                    activity={activity}
+                    index={index}
+                    updateActivity={updateActivity}
+                  />
+                </Stack>
+              </CardFooter>
+            </Center>
           </Card>
         ))}
       </SimpleGrid>
@@ -70,6 +109,7 @@ const Activity = () => {
         isOpen={isOpen}
         onClose={onClose}
         updateActivity={updateActivity}
+        event={event}
       />
     </Flex>
   );

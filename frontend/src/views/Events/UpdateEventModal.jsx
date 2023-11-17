@@ -1,24 +1,31 @@
 import React, { useState } from "react";
-import { useDisclosure } from "@chakra-ui/hooks";
 import {
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
+  useDisclosure,
   Button,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
   FormControl,
   FormLabel,
   Input,
   Select,
-  Text,
+  ModalFooter,
+  VStack,
+  Tag,
+  TagLabel,
+  TagCloseButton,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Center
 } from "@chakra-ui/react";
-import { AddIcon, CalendarIcon } from "@chakra-ui/icons";
 import { putEvent } from "../../api/event.api";
 
-const UpdateEventModal = ({ refreshEvents, event,  ...props }) => {
+const UpdateEventModal = ({ refreshEvents, event, contacts, updateEvents, ...props }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [eventData, setEventData] = useState({
     event_type: event.event_type,
@@ -27,7 +34,7 @@ const UpdateEventModal = ({ refreshEvents, event,  ...props }) => {
     description: event.description,
     is_active: true,
     creator: event.creator,
-    participants: event.participants
+    participants: event.participants,
   });
 
   const handleChange = (e) => {
@@ -36,21 +43,32 @@ const UpdateEventModal = ({ refreshEvents, event,  ...props }) => {
       ...eventData,
       [name]: value,
     });
-    console.log(eventData);
+    console.log(eventData)
+  };
+
+  const handleRemoveContact = (contactId) => {
+    setEventData((prevData) => ({
+      ...prevData,
+      participants: prevData.participants.filter((id) => id !== contactId),
+    }));
   };
 
   const handleSubmit = async () => {
     try {
-      // Llama a la función de la API para crear el event
       const newEvent = await putEvent(event.id, eventData);
-      // Actualiza la lista de activities en el componente padre
       refreshEvents(newEvent.data, props.index);
-      // Cierra el modal después de que se haya enviado el Event
       onClose();
     } catch (error) {
-      console.error("Error al crear la actividad:", error);
-      // Aquí puedes manejar el error, mostrar un mensaje al usuario, etc.
+      console.error("Error al actualizar el evento:", error);
     }
+  };
+
+  const handleContactsChange = (selectedContacts) => {
+    const uniqueContacts = Array.from(new Set(selectedContacts));
+    setEventData((prevData) => ({
+      ...prevData,
+      participants: uniqueContacts,
+    }));
   };
 
   return (
@@ -95,6 +113,34 @@ const UpdateEventModal = ({ refreshEvents, event,  ...props }) => {
                 <option value="OT">Other</option>
               </Select>
             </FormControl>
+            <FormControl mb={4}>
+              <FormLabel>Participants</FormLabel>
+              <Center>
+              <Menu>
+                <MenuButton as={Button}>
+                  Select participants
+                </MenuButton>
+                <MenuList>
+                  {contacts.map((contact) => (
+                    <MenuItem
+                      key={contact.id}
+                      onClick={() => handleContactsChange([...eventData.participants, contact.id])}
+                    >
+                      {contact.nickname}
+                    </MenuItem>
+                  ))}
+                </MenuList>
+              </Menu>
+              </Center>
+            </FormControl>
+            <VStack align="flex-start" spacing={2}>
+              {eventData.participants.map((contactId) => (
+                <Tag key={contactId} size="lg" colorScheme="teal">
+                  <TagLabel>{contacts.find((contact) => contact.id === contactId)?.nickname}</TagLabel>
+                  <TagCloseButton onClick={() => handleRemoveContact(contactId)} />
+                </Tag>
+              ))}
+            </VStack> 
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={onClose}>

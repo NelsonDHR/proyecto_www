@@ -9,8 +9,10 @@ const getConfig = () => ({
   },
 });
 
-export const getAllActivities = () => {
-  return axios.get(url, getConfig());
+export const getAllActivities = (event) => {
+  // console.log("event",event)
+  return axios.get(url, {...getConfig(), 
+  params: event});
 };
 
 export const createActivity = (activity) => {
@@ -20,4 +22,9 @@ export const createActivity = (activity) => {
 export const putActivity = (id_activity, activity) => {
   const urlId = `${url}${id_activity}/`;
   return axios.put(urlId, activity, getConfig());
+};
+
+export const inactivateActivity = (id_activity) => {
+  const urlId = `${url}${id_activity}/`;
+  return axios.delete(urlId, getConfig());
 };

@@ -16,3 +16,7 @@ export const getUser = () => {
 export const updateUser = (user) => {
   return axios.put(url, user, getConfig());
 };
+
+export const deleteUser = () => {
+  return axios.put(url, { is_active: false }, getConfig());
+};

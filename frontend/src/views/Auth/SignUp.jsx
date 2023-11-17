@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
+  Center,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -55,6 +56,8 @@ const avatars = [
 const SignUp = () => {
   const { colorMode } = useColorMode();
   const [message, setMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigateTo = useNavigate();
@@ -87,11 +90,21 @@ const SignUp = () => {
 
       const response = await signUp(formData);
       setIsSuccess(true);
-      setMessage('User created!');
+      setSuccessMessage('User created!');
       console.log(response.data);
     } catch (error) {
       setIsSuccess(false);
-      setMessage('Could not creat the user!');
+      let errorMessage = '';
+      if (error.response.data.email) {
+        errorMessage = error.response.data.email[0];
+      } else if (error.response.data.non_field_errors) {
+        errorMessage = error.response.data.non_field_errors[0];
+      } else if (error.response.data.detail) {
+        errorMessage = error.response.data.detail;
+      } else {
+        errorMessage = 'An unknown error occurred.';
+      }
+      setErrorMessage(errorMessage);
       console.error('Error al crear el usuario:', error.response.data);
     } finally {
       actions.setSubmitting(false);
@@ -303,6 +316,7 @@ const SignUp = () => {
                       </FormControl>
                     )}
                   </Field>
+                  <Center>
                   <Button
                     type="submit"
                     colorScheme="blue"
@@ -311,6 +325,7 @@ const SignUp = () => {
                   >
                     Sign Up
                   </Button>
+                  </Center>
                 </Form>
               )}
             </Formik>
@@ -335,9 +350,9 @@ const SignUp = () => {
         rounded="md"
         border="1px solid"
         borderColor={isSuccess ? 'green.200' : 'red.200'}
-        hidden={!message || isLoading}
+        hidden={!successMessage && !errorMessage || isLoading}
       >
-        {message}
+        {isSuccess ? successMessage : errorMessage}
       </Box>
     </Box>
   );

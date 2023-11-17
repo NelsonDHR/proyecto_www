@@ -21,3 +21,8 @@ export const putEvent = (id_event, event) => {
   const urlId = `${url}${id_event}/`;
   return axios.put(urlId, event, getConfig());
 };
+
+export const inactivateEvent = (id_event,event) => {
+  const urlId = `${url}${id_event}/`;
+  return axios.delete(urlId,getConfig());
+}
