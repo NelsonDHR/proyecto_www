@@ -8,7 +8,7 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=30)
     nickname = models.CharField(max_length=30)
     is_active = models.BooleanField(default=True)
-    avatar = models.ImageField(upload_to='avatars/users/', null=True, blank=True)
+    avatar = models.ImageField(upload_to='images/users/', null=True, blank=True)
     avatar_name = models.CharField(max_length=255, null=True, blank=True)
     contacts = models.ManyToManyField('self', symmetrical=False, blank=True)
 
@@ -17,15 +17,16 @@ class User(AbstractUser):
 
 class Event(models.Model):
     EVENT_TYPES = (
-        ('TR', 'Viaje'),
-        ('HM', 'Hogar'),
-        ('PR', 'Pareja'),
-        ('FD', 'Comida'),
-        ('OT', 'Otro'),
+        ('TR', 'Travel'),
+        ('HM', 'Home'),
+        ('CP', 'Couple'),
+        ('FD', 'Food'),
+        ('OT', 'Other'),
     )
     event_type = models.CharField(max_length=2, choices=EVENT_TYPES)
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_events')
-    avatar = models.ImageField(upload_to='avatars/events/', null=True, blank=True)
+    image = models.ImageField(upload_to='images/events/', null=True, blank=True)
+    image_name = models.CharField(max_length=255, null=True, blank=True)
     name = models.CharField(max_length=255)
     description = models.TextField()
     date = models.DateTimeField()
@@ -36,13 +37,20 @@ class Event(models.Model):
         return f"{self.name} {self.creator}"
 
 class Activity(models.Model):
+    PAYMENT_TYPES = (
+        ('PR', 'Percentage'),
+        ('FV', 'Fixed value'),
+    )
+    payment_type = models.CharField(max_length=2, choices=PAYMENT_TYPES, default='FV')
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_activities')
-    avatar = models.ImageField(upload_to='avatars/activities/', null=True, blank=True)
+    image = models.ImageField(upload_to='images/activities/', null=True, blank=True)
+    image_name = models.CharField(max_length=255, null=True, blank=True)
     name = models.CharField(max_length=255)
     description = models.TextField()
-    value = models.DecimalField(max_digits=10, decimal_places=2)
+    value = models.DecimalField(max_digits=12, decimal_places=2)
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='activities')
     participants = models.ManyToManyField(User, through='ParticipationActivity', related_name='activities')
+    is_equitable = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
     
     def __str__(self):
@@ -57,22 +65,19 @@ class ParticipationEvent(models.Model):
         return f"{self.event.name} {self.user.nickname}"
 
 class ParticipationActivity(models.Model):
-    PAYMENT_TYPES = (
-        ('PR', 'Porcentaje'),
-        ('VF', 'Valor fijo'),
-    )
-    payment_type = models.CharField(max_length=2, choices=PAYMENT_TYPES)
-    activity = models.ForeignKey(Activity, on_delete=models.CASCADE, related_name='participations')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='participaton_activities')
-    value_type = models.DecimalField(max_digits=5, decimal_places=2)
+    activity = models.ForeignKey(Activity, on_delete=models.CASCADE, related_name='participations')
+    value_to_pay = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    percentage_to_pay = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     is_paid = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
     
     def __str__(self):
         return f"{self.activity.name} {self.user.nickname}"
 
 class Payment(models.Model):
     participation_activity = models.ForeignKey(ParticipationActivity, on_delete=models.CASCADE, related_name='payments')
-    value = models.DecimalField(max_digits=10, decimal_places=2)
+    value = models.DecimalField(max_digits=12, decimal_places=2)
     date = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):

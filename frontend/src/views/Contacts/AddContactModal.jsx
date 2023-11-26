@@ -1,6 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { IoMdContact } from "react-icons/io";
 import { useDisclosure } from "@chakra-ui/hooks";
 import {
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Icon,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -8,35 +14,68 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
-  Icon,
-  Text
+  Text,
+  useToast,
 } from "@chakra-ui/react";
 import { addContact } from '../../api/contacts.api';
-import { IoMdContact } from "react-icons/io";
+import { getUser } from '../../api/profile.api';
 
 const AddContactModal = ({ updateContacts, ...props }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [email, setEmail] = useState("");
+  const [currentUserEmail, setCurrentUserEmail] = useState(null);
+  const toast = useToast();
+
+  useEffect(() => {
+    getUser()
+      .then((response) => {
+        setCurrentUserEmail(response.data.email);
+      })
+      .catch((error) => {
+        console.error('Error fetching current user email:', error);
+      });
+  }, []);
 
   const handleChange = (e) => {
     setEmail(e.target.value);
   };
 
   const handleSubmit = async () => {
+    if (email === currentUserEmail) {
+      toast({
+        title: "Error at adding the contact.",
+        description: "You can't add yourself as a contact.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    if (props.contactsList.some((contact) => contact.email === email)) {
+      toast({
+        title: "Error at adding the contact.",
+        description: "You already have this contact.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+
     try {
-      // Llama a la función de la API para agregar el contacto
       await addContact({ email });
-      // Actualiza la lista de contactos en el componente padre
       updateContacts();
-      // Cierra el modal después de que se haya enviado el contacto
+      toast({
+        title: "Contact added.",
+        description: `You have added ${email} to your contacts.`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
       onClose();
     } catch (error) {
       console.error("Error al agregar el contacto:", error);
-      // Aquí puedes manejar el error, mostrar un mensaje al usuario, etc.
     }
   };
 
@@ -45,9 +84,10 @@ const AddContactModal = ({ updateContacts, ...props }) => {
   return (
     <>
       <Button
-        position="absolute"
+        position="fixed"
         bottom="2rem"
         right="2rem"
+        style={{ zIndex: 9999 }}
         colorScheme="teal"
         size="lg"
         borderRadius="full"
