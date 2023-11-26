@@ -21,7 +21,7 @@ const DeleteEventModal = ({ deleteEvents, event, index, ...props }) => {
   const handleSubmit = async () => {
     console.log(event)
     try {
-      await inactivateEvent(event.id,event);
+      await inactivateEvent(event.id);
       deleteEvents(index);
       onClose();
     } catch (error) {

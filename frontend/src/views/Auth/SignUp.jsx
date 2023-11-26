@@ -16,6 +16,7 @@ import {
   Spinner,
   Text,
   useColorMode,
+  useColorModeValue
 } from '@chakra-ui/react';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
@@ -29,6 +30,7 @@ import woman3 from '../../assets/avatars/woman-3.png';
 import bear from '../../assets/avatars/bear.png';
 import cat from '../../assets/avatars/cat.png';
 import panda from '../../assets/avatars/panda.png';
+
 import ToggleColorMode from '../../components/ToggleColorMode';
 
 import { signUp } from '../../api/auth.api';
@@ -55,6 +57,7 @@ const avatars = [
 
 const SignUp = () => {
   const { colorMode } = useColorMode();
+  const modalBgColor = useColorModeValue('white', 'gray.700');
   const [message, setMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -142,10 +145,12 @@ const SignUp = () => {
           p="6"
           border="1px solid"
           borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}
+          position="relative"
         >
           <Heading as="h1" size="lg" mb="2" textAlign="center">
             Sign Up
           </Heading>
+
           <Box
             display="flex"
             flexDirection="column"
@@ -155,7 +160,7 @@ const SignUp = () => {
             width="100%"
             css={{
               '&::-webkit-scrollbar': {
-                width: '4px',
+                width: '6px',
               },
               '&::-webkit-scrollbar-track': {
                 width: '6px',
@@ -163,6 +168,9 @@ const SignUp = () => {
               '&::-webkit-scrollbar-thumb': {
                 background: 'gray',
                 borderRadius: '24px',
+              },
+              '&::-webkit-scrollbar-thumb:hover': {
+                background: '#888', // Cambia esto al color que prefieras
               }
             }}>
             <Formik
@@ -178,6 +186,7 @@ const SignUp = () => {
               validationSchema={SignUpSchema}
               onSubmit={handleSubmit}
             >
+
               {({ isSubmitting, setFieldValue, values }) => (
                 <Form>
                   <Grid templateColumns="repeat(3, 1fr)" gap={4} m="4">
@@ -317,19 +326,29 @@ const SignUp = () => {
                     )}
                   </Field>
                   <Center>
-                  <Button
-                    type="submit"
-                    colorScheme="blue"
-                    isLoading={isSubmitting}
-                    mb="4"
-                  >
-                    Sign Up
-                  </Button>
+                    <Button
+                      type="submit"
+                      colorScheme="blue"
+                      isLoading={isSubmitting}
+                      mb="4"
+                    >
+                      Sign Up
+                    </Button>
                   </Center>
                 </Form>
               )}
             </Formik>
           </Box>
+          <Box
+            position="absolute"
+            bottom="50"
+            left="0"
+            width="100%"
+            height="50px"
+            backgroundImage={`linear-gradient(to top, ${modalBgColor}, transparent)`}
+            zIndex="2"
+            pointerEvents="none"
+          />
           <Box
             display="flex"
             flexDirection="column"

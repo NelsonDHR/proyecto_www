@@ -19,88 +19,119 @@ import {
   MenuItem,
   MenuList,
   Center,
-  VStack,
   TagLabel,
   Tag,
-  TagCloseButton
+  TagCloseButton,
+  Wrap,
+  WrapItem,
 } from "@chakra-ui/react";
 import { CalendarIcon } from '@chakra-ui/icons';
-import { getAllContacts } from '../../api/contacts.api'; 
+import { getAllContacts } from '../../api/contacts.api';
 import { createEvent } from '../../api/event.api';
+import { getUser } from '../../api/profile.api';
 
 const AddEventModal = ({ updateEvents, ...props }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [contacts, setContacts] = useState([]);
+  const [isHovered, setIsHovered] = useState(false);
   const [eventData, setEventData] = useState({
-    event_type: "",
-    avatar: null,
-    name: "",
     description: "",
+    event_type: "",
+    image: null,
+    image_name: "",
     is_active: true,
-    creator: 1,
+    name: "",
     participants: []
   });
-  const [contacts, setContacts] = useState([]);
 
-  useEffect(() => {
-    // Cargar contactos cuando se abre el modal
-    loadContacts();
-  }, []);
+  const eventTypeToImageName = {
+    "TR": "travel.png",
+    "HM": "home.png",
+    "CP": "couple.png",
+    "FD": "food.png",
+    "OT": "other.png"
+  };
 
   const loadContacts = async () => {
     try {
       const response = await getAllContacts();
-      setContacts(response.data);
-      console.log(contacts)
+      const user = await getUser();
+      setContacts([user.data, ...response.data]);
     } catch (error) {
       console.error("Error loading contacts:", error);
     }
   };
 
+  // Handle Functions
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setEventData({
-      ...eventData,
-      [name]: value,
-    });
-    console.log(eventData)
+    if (name === "event_type") {
+      setEventData({
+        ...eventData,
+        [name]: value,
+        image_name: eventTypeToImageName[value],
+      });
+    } else {
+      setEventData({
+        ...eventData,
+        [name]: value,
+      });
+    }
   };
 
   const handleContactsChange = (selectedContacts) => {
-    const uniqueContacts = Array.from(new Set(selectedContacts));
+    const uniqueContacts = Array.from(new Set([eventData.participants[0], ...selectedContacts]));
     setEventData((prevData) => ({
       ...prevData,
       participants: uniqueContacts,
     }));
   };
+
   const handleRemoveContact = (contactId) => {
-    setEventData((prevData) => ({
-      ...prevData,
-      participants: prevData.participants.filter((id) => id !== contactId),
-    }));
+    if (contactId !== eventData.participants[0]) {
+      setEventData((prevData) => ({
+        ...prevData,
+        participants: prevData.participants.filter((id) => id !== contactId),
+      }));
+    }
   };
 
   const handleSubmit = async () => {
     try {
-      // Llama a la función de la API para crear el evento
       const newEvent = await createEvent(eventData);
-      // Actualiza la lista de eventos en el componente padre
-      updateEvents(newEvent.data);
-      // Cierra el modal después de que se haya enviado el evento
+      console.log("Evento creado:", newEvent)
+      updateEvents();
       onClose();
     } catch (error) {
       console.error("Error al crear el evento:", error);
-      // Aquí puedes manejar el error, mostrar un mensaje al usuario, etc.
     }
   };
 
-  const [isHovered, setIsHovered] = useState(false);
+  // Use Effects
+
+  useEffect(() => {
+    loadContacts();
+  }, []);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const user = await getUser();
+      setEventData(prevData => ({
+        ...prevData,
+        participants: [user.data.id]
+      }));
+    };
+    fetchUser();
+  }, []);
 
   return (
     <>
       <Button
-        position="absolute"
+        position="fixed"
         bottom="2rem"
         right="2rem"
+        style={{ zIndex: 9999 }}  
         colorScheme="teal"
         size="lg"
         borderRadius="full"
@@ -127,7 +158,22 @@ const AddEventModal = ({ updateEvents, ...props }) => {
         <ModalContent margin="auto">
           <ModalHeader pb={4}>Create Event</ModalHeader>
           <ModalCloseButton />
-          <ModalBody>
+          <ModalBody
+            maxH="400px"
+            overflowY="scroll"
+            css={{
+              "&::-webkit-scrollbar": {
+                width: "4px",
+              },
+              "&::-webkit-scrollbar-track": {
+                width: "6px",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                background: "gray",
+                borderRadius: "24px",
+              },
+            }}
+          >
             <FormControl mb={4}>
               <FormLabel>Name of the event</FormLabel>
               <Input
@@ -156,7 +202,7 @@ const AddEventModal = ({ updateEvents, ...props }) => {
                 <option value="">Select a type of event</option>
                 <option value="TR">Travel</option>
                 <option value="HM">Home</option>
-                <option value="PR">Couple</option>
+                <option value="CP">Couple</option>
                 <option value="FD">Food</option>
                 <option value="OT">Other</option>
               </Select>
@@ -164,31 +210,33 @@ const AddEventModal = ({ updateEvents, ...props }) => {
             <FormControl mb={4}>
               <FormLabel>Participants</FormLabel>
               <Center>
-              <Menu>
-                <MenuButton as={Button}>
-                  Select participants
-                </MenuButton>
-                <MenuList>
-                  {contacts.map((contact) => (
-                    <MenuItem
-                      key={contact.id}
-                      onClick={() => handleContactsChange([...eventData.participants, contact.id])}
-                    >
-                      {contact.nickname}
-                    </MenuItem>
-                  ))}
-                </MenuList>
-              </Menu>
+                <Menu>
+                  <MenuButton as={Button}>
+                    Select participants
+                  </MenuButton>
+                  <MenuList>
+                    {contacts.map((contact) => (
+                      <MenuItem
+                        key={contact.id}
+                        onClick={() => handleContactsChange([...eventData.participants, contact.id])}
+                      >
+                        {contact.nickname}
+                      </MenuItem>
+                    ))}
+                  </MenuList>
+                </Menu>
               </Center>
             </FormControl>
-             <VStack align="flex-start" spacing={2}>
+            <Wrap spacing={2}>
               {eventData.participants.map((contactId) => (
-                <Tag key={contactId} size="lg" colorScheme="teal">
-                  <TagLabel>{contacts.find((contact) => contact.id === contactId)?.nickname}</TagLabel>
-                  <TagCloseButton onClick={() => handleRemoveContact(contactId)} />
-                </Tag>
+                <WrapItem key={contactId}>
+                  <Tag size="lg" colorScheme="teal">
+                    <TagLabel>{contacts.find((contact) => contact.id === contactId)?.nickname}</TagLabel>
+                    <TagCloseButton onClick={() => handleRemoveContact(contactId)} />
+                  </Tag>
+                </WrapItem>
               ))}
-            </VStack> 
+            </Wrap>
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={onClose}>

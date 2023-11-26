@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// const url = import.meta.env.VITE_BACKEND_URL_LOCAL + "/splitcount/user/";
-const url = import.meta.env.VITE_BACKEND_URL_PROD + "/splitcount/user/";
+const url = import.meta.env.VITE_BACKEND_URL_LOCAL + "/splitcount/user/";
+// const url = import.meta.env.VITE_BACKEND_URL_PROD + "/splitcount/user/";
 
 const getConfig = () => ({
   headers: {
@@ -11,6 +11,10 @@ const getConfig = () => ({
 
 export const getUser = () => {
   return axios.get(url, getConfig());
+};
+
+export const getUserById = (id) => {
+  return axios.get(`${url}${id}/`, getConfig());
 };
 
 export const updateUser = (user) => {

@@ -1,75 +1,71 @@
 import React, { useState, useEffect } from "react";
+import { RxActivityLog } from "react-icons/rx";
+import { Carousel } from 'react-responsive-carousel';
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { useDisclosure } from "@chakra-ui/hooks";
 import {
+  Box,
+  Button,
+  Checkbox,
+  Flex,
   Modal,
+  FormControl,
+  FormLabel,
+  HStack,
+  Icon,
+  Image,
+  Input,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Box,
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
-  Icon,
+  Radio,
+  RadioGroup,
+  Stack,
+  Switch,
   Text,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Center,
-  VStack,
-  TagLabel,
-  Tag,
-  TagCloseButton,
 } from "@chakra-ui/react";
+import decoration from "../../assets/activities/decoration.jpg";
+import drinking from "../../assets/activities/drinking.jpg";
+import planning from "../../assets/activities/planning.jpg";
+import shopping from "../../assets/activities/shopping.jpg";
+import tickets from "../../assets/activities/tickets.jpg";
+import transportation from "../../assets/activities/transportation.jpg";
 import { createActivity } from "../../api/activity.api";
-import { RxActivityLog } from "react-icons/rx";
-import { getAllContacts } from "../../api/contacts.api";
+import { getEventParticipants } from "../../api/event.api";
 
-const AddActivityModal = ({ updateActivity, ...props }) => {
+const AddActivityModal = ({ updateActivities, ...props }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [contacts, setContacts] = useState([]);
+  const [participants, setParticipants] = useState([]);
+  const [selectedParticipants, setSelectedParticipants] = useState({});
+  const [editedValues, setEditedValues] = useState({});
+  const [paymentType, setPaymentType] = useState('FV');
+  const [isAdvanced, setIsAdvanced] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const [activityData, setActivityData] = useState({
-    creator: "",
-    avatar: null,
+    event: props.event.id,
     name: "",
     description: "",
+    image: null,
+    image_name: "",
     value: "",
-    event: props.event.id,
-    participants: [],
+    payment_type: "FV",
+    is_equitable: true,
     is_active: true,
+    participants: [],
   });
 
-  useEffect(() => {
-    // Cargar contactos cuando se abre el modal
-    loadContacts();
-  }, []);
+  const imageNames = [decoration, drinking, planning, shopping, tickets, transportation];
+  const imageFileNames = ["decoration.jpg", "drinking.jpg", "planning.jpg", "shopping.jpg", "tickets.jpg", "transportation.jpg"];
 
-  const loadContacts = async () => {
-    try {
-      const response = await getAllContacts();
-      setContacts(response.data);
-      console.log(contacts);
-    } catch (error) {
-      console.error("Error loading contacts:", error);
-    }
-  };
-  const handleContactsChange = (selectedContacts) => {
-    const uniqueContacts = Array.from(new Set(selectedContacts));
-    setActivityData((prevData) => ({
-      ...prevData,
-      participants: uniqueContacts,
-    }));
-  };
-  const handleRemoveContact = (contactId) => {
-    setActivityData((prevData) => ({
-      ...prevData,
-      participants: prevData.participants.filter((id) => id !== contactId),
-    }));
-  };
+  // Handle Functions
+
+  /* This function handles changes in the form inputs.
+  It updates the activityData state with the new input values.
+  If the input that changed was the "value" input, it also recalculates 
+  the cost per participant and updates the selectedParticipants state. */
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -77,32 +73,155 @@ const AddActivityModal = ({ updateActivity, ...props }) => {
       ...activityData,
       [name]: value,
     });
-    console.log(activityData);
-  };
 
-  const handleSubmit = async () => {
-    try {
-      // console.log("DATA", activityData)
-      // Llama a la función de la API para crear el activityo
-      const newActivity = await createActivity(activityData);
-      // Actualiza la lista de activities en el componente padre
-      updateActivity(newActivity.data);
-      // Cierra el modal después de que se haya enviado el Activity
-      onClose();
-    } catch (error) {
-      console.error("Error al crear la actividad:", error);
-      // Aquí puedes manejar el error, mostrar un mensaje al usuario, etc.
+    if (name === "value") {
+      const costPerParticipant = value / Object.keys(selectedParticipants).length;
+      const updatedParticipants = Object.fromEntries(
+        Object.entries(selectedParticipants).map(([id, participant]) => [
+          id,
+          { ...participant, cost: participant.isSelected ? costPerParticipant : 0 },
+        ])
+      );
+      setSelectedParticipants(updatedParticipants);
     }
   };
 
-  const [isHovered, setIsHovered] = useState(false);
+  /* This function handles changes in the cost input for 
+  each participant when the advanced mode is enabled.
+  It updates the editedValues state with the new cost value 
+  for the given participant ID. */
+
+  const handleCostChange = (id, value) => {
+    if (isAdvanced) {
+      setEditedValues(prev => ({ ...prev, [id]: value }));
+    }
+  };
+
+  /* This function handles changes in the selection of participants.
+  It updates the selectedParticipants state to reflect the new selection.
+  It also recalculates the cost or percentage per participant based on the 
+  new selection and updates the cost for each participant in selectedParticipants.*/
+
+  const handleParticipantsChange = (participantId) => {
+    setSelectedParticipants((prev) => {
+      const updatedParticipants = {
+        ...prev,
+        [participantId]: {
+          ...prev[participantId],
+          isSelected: !prev[participantId]?.isSelected,
+        },
+      };
+
+      const selectedCount = Object.values(updatedParticipants).filter(p => p.isSelected).length;
+      const costOrPercentagePerParticipant = paymentType === 'FV' ? activityData.value / selectedCount : 100 / selectedCount;
+
+      for (const id in updatedParticipants) {
+        if (updatedParticipants[id].isSelected) {
+          updatedParticipants[id].cost = costOrPercentagePerParticipant;
+        } else {
+          updatedParticipants[id].cost = 0;
+        }
+      }
+
+      return updatedParticipants;
+    });
+  };
+
+  /* This function handles the submission of the form.
+  It creates a new activity with the data from the form and the selected 
+  participants, and then updates the activities state with the new activity. */
+
+  const handleSubmit = async () => {
+    try {
+      const participants = Object.entries(selectedParticipants)
+        .filter(([id, participant]) => participant.isSelected)
+        .map(([id, participant]) => {
+          // Dependiendo del tipo de pago, envía value_to_pay o percentage_to_pay
+          if (paymentType === 'FV') {
+            return {
+              id,
+              value_to_pay: isAdvanced ? editedValues[id] : participant.cost,
+            };
+          } else {
+            return {
+              id,
+              percentage_to_pay: isAdvanced ? editedValues[id] : participant.cost,
+            };
+          }
+        });
+
+      const newActivityData = {
+        ...activityData,
+        payment_type: paymentType,
+        is_equitable: !isAdvanced,
+        participants,
+      };
+
+      const newActivity = await createActivity(newActivityData);
+      updateActivities(newActivity.data);
+      onClose();
+    } catch (error) {
+      console.error("Error al crear la actividad:", error);
+    }
+  };
+
+  // Use Effects
+
+  /* This effect runs once when the component mounts.
+  It fetches the participants for the event and sets the participants 
+  and selectedParticipants states with the fetched data. */
+
+  useEffect(() => {
+    const loadParticipants = async () => {
+      try {
+        const participants = await getEventParticipants(props.event.id);
+        setParticipants(participants.data);
+
+        const initialSelectedParticipants = participants.data.reduce((acc, participant) => {
+          acc[participant.id] = { isSelected: true, cost: activityData.value / participants.data.length };
+          return acc;
+        }, {});
+        setSelectedParticipants(initialSelectedParticipants);
+
+      } catch (error) {
+        console.error("Error loading participants:", error);
+      }
+    };
+
+    loadParticipants();
+  }, []);
+
+  /* This effect runs whenever the paymentType or activityData.value changes.
+  It recalculates the cost or percentage per participant based on the new values 
+  and updates the cost for each participant in selectedParticipants. */
+
+  useEffect(() => {
+    setSelectedParticipants((prev) => {
+      const updatedParticipants = { ...prev };
+
+      const selectedCount = Object.values(updatedParticipants).filter(p => p.isSelected).length;
+      const costOrPercentagePerParticipant = paymentType === 'FV' ? activityData.value / selectedCount : 100 / selectedCount;
+
+      for (const id in updatedParticipants) {
+        if (updatedParticipants[id].isSelected) {
+          updatedParticipants[id].cost = costOrPercentagePerParticipant;
+        } else {
+          updatedParticipants[id].cost = 0;
+        }
+      }
+
+      return updatedParticipants;
+    });
+
+  }, [paymentType, activityData.value]);
 
   return (
     <>
       <Button
-        position="absolute"
+        position="fixed"
         bottom="2rem"
         right="2rem"
+        style={{ zIndex: 9999 }}
         colorScheme="teal"
         size="lg"
         borderRadius="full"
@@ -133,6 +252,44 @@ const AddActivityModal = ({ updateActivity, ...props }) => {
         <ModalContent margin="auto">
           <ModalHeader pb={4}>Create Activity</ModalHeader>
           <ModalCloseButton />
+
+          <Box
+            position="relative"
+            width="100%"
+            height="100px"
+            _after={{
+              content: '""',
+              display: 'block',
+              position: 'absolute',
+              top: '0',
+              left: '0',
+              width: '100%',
+              height: '100%',
+              backgroundImage: 'linear-gradient(200deg, transparent, black)',
+              zIndex: '1',
+            }}
+          >
+            <Carousel
+              showThumbs={false}
+              showStatus={false}
+              dynamicHeight={false}
+              infiniteLoop={true}
+              onChange={(index) => setActivityData({ ...activityData, image_name: imageFileNames[index] })}
+            >
+              {imageNames.map((imageName, index) => (
+                <div key={index}>
+                  <Image
+                    src={imageName}
+                    alt={`Activity ${index + 1}`}
+                    width="100%"
+                    height="100px"
+                    objectFit="cover"
+                  />
+                </div>
+              ))}
+            </Carousel>
+          </Box>
+
           <ModalBody
             maxH="400px"
             overflowY="scroll"
@@ -149,6 +306,7 @@ const AddActivityModal = ({ updateActivity, ...props }) => {
               },
             }}
           >
+
             <FormControl mb={4}>
               <FormLabel>Name of the activity</FormLabel>
               <Input
@@ -158,6 +316,7 @@ const AddActivityModal = ({ updateActivity, ...props }) => {
                 onChange={handleChange}
               />
             </FormControl>
+
             <FormControl mb={4}>
               <FormLabel>Activity description</FormLabel>
               <Input
@@ -167,6 +326,7 @@ const AddActivityModal = ({ updateActivity, ...props }) => {
                 onChange={handleChange}
               />
             </FormControl>
+
             <FormControl mb={4}>
               <FormLabel>Value of the activity</FormLabel>
               <Input
@@ -178,43 +338,44 @@ const AddActivityModal = ({ updateActivity, ...props }) => {
             </FormControl>
 
             <FormControl mb={4}>
-              <FormLabel>Participants</FormLabel>
-              <Center>
-                <Menu>
-                  <MenuButton as={Button}>Select participants</MenuButton>
-                  <MenuList>
-                    {contacts.map((contact) => (
-                      <MenuItem
-                        key={contact.id}
-                        onClick={() =>
-                          handleContactsChange([
-                            ...activityData.participants,
-                            contact.id,
-                          ])
-                        }
-                      >
-                        {contact.nickname}
-                      </MenuItem>
-                    ))}
-                  </MenuList>
-                </Menu>
-              </Center>
+              <FormLabel>Type of payment</FormLabel>
+              <RadioGroup value={paymentType} onChange={setPaymentType}>
+                <Stack direction="row">
+                  <Radio value="FV">Fixed value</Radio>
+                  <Radio value="PR">Percentage</Radio>
+                </Stack>
+              </RadioGroup>
             </FormControl>
-            <VStack align="flex-start" spacing={2}>
-              {activityData.participants.map((contactId) => (
-                <Tag key={contactId} size="lg" colorScheme="teal">
-                  <TagLabel>
-                    {
-                      contacts.find((contact) => contact.id === contactId)
-                        ?.nickname
-                    }
-                  </TagLabel>
-                  <TagCloseButton
-                    onClick={() => handleRemoveContact(contactId)}
+
+            <FormControl mb={4}>
+              <Flex justify="space-between" align="center" mb={4}>
+                <FormLabel>Participants</FormLabel>
+                <HStack spacing="24px">
+                  <Switch isChecked={isAdvanced} onChange={(e) => setIsAdvanced(e.target.checked)} />
+                  <FormLabel>Advanced</FormLabel>
+                </HStack>
+              </Flex>
+              {participants.map((participant) => (
+                <Flex justify="space-between" align="center" key={participant.id} mt={2}>
+                  <Checkbox
+                    isChecked={selectedParticipants[participant.id]?.isSelected}
+                    onChange={() => handleParticipantsChange(participant.id)}
+                    mb={2}
+                  >
+                    {participant.nickname}
+                  </Checkbox>
+                  <Input
+                    type="number"
+                    placeholder="Enter value"
+                    value={isAdvanced ? (editedValues[participant.id] || '') : (selectedParticipants[participant.id]?.isSelected ? selectedParticipants[participant.id].cost.toFixed(2) : 0)}
+                    onChange={(e) => handleCostChange(participant.id, e.target.value)}
+                    disabled={!isAdvanced || !selectedParticipants[participant.id]?.isSelected}
+                    width="150px"
                   />
-                </Tag>
+                </Flex>
               ))}
-            </VStack>
+            </FormControl>
+
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={onClose}>

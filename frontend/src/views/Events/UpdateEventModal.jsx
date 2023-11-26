@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   useDisclosure,
   Button,
@@ -13,7 +13,6 @@ import {
   Input,
   Select,
   ModalFooter,
-  VStack,
   Tag,
   TagLabel,
   TagCloseButton,
@@ -21,21 +20,39 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
-  Center
+  Center,
+  Wrap,
+  WrapItem,
 } from "@chakra-ui/react";
 import { putEvent } from "../../api/event.api";
 
 const UpdateEventModal = ({ refreshEvents, event, contacts, updateEvents, ...props }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [eventData, setEventData] = useState({
-    event_type: event.event_type,
-    avatar: null,
-    name: event.name,
     description: event.description,
+    event_type: event.event_type,
+    image: event.image,
+    image_name: event.image_name,
     is_active: true,
-    creator: event.creator,
-    participants: event.participants,
+    name: event.name,
+    participants: event.participants.map(participant => participant.id)
   });
+
+  const [participants, setParticipants] = useState(event.participants);
+  const [allParticipants, setAllParticipants] = useState([]);
+
+  useEffect(() => {
+    
+    setParticipants(event.participants);
+
+    const combinedList = [...contacts, ...event.participants];
+    const uniqueList = Array.from(new Set(combinedList.map(a => a.id)))
+      .map(id => {
+        return combinedList.find(a => a.id === id)
+      });
+
+    setAllParticipants(uniqueList);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -43,37 +60,39 @@ const UpdateEventModal = ({ refreshEvents, event, contacts, updateEvents, ...pro
       ...eventData,
       [name]: value,
     });
-    console.log(eventData)
   };
 
-  const handleRemoveContact = (contactId) => {
+  const handleParticipantsChange = (selectedParticipants) => {
+    const uniqueParticipants = Array.from(new Set([eventData.participants[0], ...selectedParticipants]));
     setEventData((prevData) => ({
       ...prevData,
-      participants: prevData.participants.filter((id) => id !== contactId),
+      participants: uniqueParticipants,
     }));
+  };
+
+  const handleRemoveParticipants = (participantId) => {
+    if (participantId !== eventData.participants[0]) {
+      setEventData((prevData) => ({
+        ...prevData,
+        participants: prevData.participants.filter((id) => id !== participantId),
+      }));
+    }
   };
 
   const handleSubmit = async () => {
     try {
       const newEvent = await putEvent(event.id, eventData);
       refreshEvents(newEvent.data, props.index);
+      console.log("Evento actualizado:", eventData);
       onClose();
     } catch (error) {
       console.error("Error al actualizar el evento:", error);
     }
   };
 
-  const handleContactsChange = (selectedContacts) => {
-    const uniqueContacts = Array.from(new Set(selectedContacts));
-    setEventData((prevData) => ({
-      ...prevData,
-      participants: uniqueContacts,
-    }));
-  };
-
   return (
     <>
-      <Button onClick={onOpen}>Edit Event</Button>
+      <Button onClick={onOpen} colorScheme="blue">Edit Event</Button>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent margin="auto">
@@ -116,31 +135,33 @@ const UpdateEventModal = ({ refreshEvents, event, contacts, updateEvents, ...pro
             <FormControl mb={4}>
               <FormLabel>Participants</FormLabel>
               <Center>
-              <Menu>
-                <MenuButton as={Button}>
-                  Select participants
-                </MenuButton>
-                <MenuList>
-                  {contacts.map((contact) => (
-                    <MenuItem
-                      key={contact.id}
-                      onClick={() => handleContactsChange([...eventData.participants, contact.id])}
-                    >
-                      {contact.nickname}
-                    </MenuItem>
-                  ))}
-                </MenuList>
-              </Menu>
+                <Menu>
+                  <MenuButton as={Button}>
+                    Select participants
+                  </MenuButton>
+                  <MenuList>
+                    {allParticipants.map((participant) => (
+                      <MenuItem
+                        key={participant.id}
+                        onClick={() => handleParticipantsChange([...eventData.participants, participant.id])}
+                      >
+                        {participant.nickname}
+                      </MenuItem>
+                    ))}
+                  </MenuList>
+                </Menu>
               </Center>
             </FormControl>
-            <VStack align="flex-start" spacing={2}>
-              {eventData.participants.map((contactId) => (
-                <Tag key={contactId} size="lg" colorScheme="teal">
-                  <TagLabel>{contacts.find((contact) => contact.id === contactId)?.nickname}</TagLabel>
-                  <TagCloseButton onClick={() => handleRemoveContact(contactId)} />
-                </Tag>
+            <Wrap spacing={2}>
+              {eventData.participants.map((participantId) => (
+                <WrapItem key={participantId}>
+                  <Tag size="lg" colorScheme="teal">
+                    <TagLabel>{allParticipants.find((participant) => participant.id === participantId)?.nickname}</TagLabel>
+                    <TagCloseButton onClick={() => handleRemoveParticipants(participantId)} />
+                  </Tag>
+                </WrapItem>
               ))}
-            </VStack> 
+            </Wrap>
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={onClose}>
@@ -157,3 +178,4 @@ const UpdateEventModal = ({ refreshEvents, event, contacts, updateEvents, ...pro
 };
 
 export default UpdateEventModal;
+

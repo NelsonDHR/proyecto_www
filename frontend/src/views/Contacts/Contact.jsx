@@ -1,20 +1,16 @@
-// Contact.jsx
 import React from 'react';
 import { Box, Avatar, Text, Button, Flex, Spacer, useColorMode, useToast } from '@chakra-ui/react';
 import { DeleteIcon } from '@chakra-ui/icons';
-import { deleteContact } from '../../api/contacts.api'; // Asegúrate de tener esta función en tu API
+import { deleteContact } from '../../api/contacts.api';
 
 const Contact = ({ contact, updateContacts }) => {
-  const colorMode = useColorMode();
+  const { colorMode } = useColorMode();
   const toast = useToast();
 
   const handleDelete = async () => {
     try {
-      // Llama a la función de la API para eliminar el contacto
       await deleteContact({ email: contact.email });
-      // Actualiza la lista de contactos en el componente padre
       updateContacts();
-      // Muestra un mensaje de éxito
       toast({
         title: "Contact deleted.",
         description: `You have deleted ${contact.nickname} from your contacts.`,
@@ -24,7 +20,6 @@ const Contact = ({ contact, updateContacts }) => {
       });
     } catch (error) {
       console.error("Error al eliminar el contacto:", error);
-      // Aquí puedes manejar el error, mostrar un mensaje al usuario, etc.
       toast({
         title: "Error at deleting the contact.",
         description: "An error occurred while trying to delete the contact. Please try again.",

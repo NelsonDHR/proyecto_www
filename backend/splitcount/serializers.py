@@ -7,7 +7,7 @@ from .models import *
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id','email', 'first_name', 'last_name',
+        fields = ['id', 'email', 'first_name', 'last_name',
                   'nickname', 'password', 'avatar_name']
         extra_kwargs = {'password': {'write_only': True}}
 
@@ -30,20 +30,39 @@ class ContactSerializer(serializers.Serializer):
 
 
 class EventSerializer(serializers.ModelSerializer):
+    participants = UserSerializer(many=True, read_only=True)
+
     class Meta:
         model = Event
-        # Excluir el campo 'date' de los campos serializados
-        exclude = ['date']
+        exclude = ['date']  # Excluye 'date' durante la creación
 
     def create(self, validated_data):
-        # Importa timezone desde django.utils
         validated_data['date'] = timezone.now()
         event = Event(**validated_data)
         event.save()
         return event
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['date'] = instance.date  # Incluye 'date' cuando se obtienen los eventos
+        return representation
+
+
+class ParticipationActivitySerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = ParticipationActivity
+        fields = ['user', 'value_to_pay', 'percentage_to_pay', 'is_paid', 'is_active']
+
 
 class ActivitySerializer(serializers.ModelSerializer):
+    participation_activities = serializers.SerializerMethodField()
+
     class Meta:
         model = Activity
         fields = '__all__'
+
+    def get_participation_activities(self, obj):
+        participation_activities = ParticipationActivity.objects.filter(activity=obj)
+        return ParticipationActivitySerializer(participation_activities, many=True).data
