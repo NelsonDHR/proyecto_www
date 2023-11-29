@@ -1,3 +1,4 @@
+from decimal import Decimal
 from rest_framework import status, viewsets, generics
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
@@ -302,3 +303,46 @@ class UserDetailByIdView(generics.RetrieveAPIView):
     def get_object(self):
         user_id = self.kwargs['user_id']
         return get_object_or_404(User, id=user_id)
+    
+class EventBalancesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, event_id, *args, **kwargs):
+        activities = ParticipationActivity.objects.filter(
+            activity__event_id=event_id, is_active=True
+        )
+
+        balances = {}
+        creator_balance = Decimal('0')
+
+        for participation_activity in activities:
+            user = participation_activity.user
+            user_id = user.id
+            creator_id = participation_activity.activity.creator.id
+
+            if user_id not in balances:
+                balances[user_id] = {'name': user.nickname, 'balance': Decimal('0')}
+
+            activity_payment_type = participation_activity.activity.payment_type
+
+            if activity_payment_type == 'PR':
+                # Percentage
+                balances[user_id]['balance'] += Decimal(participation_activity.activity.value) * (
+                    participation_activity.percentage_to_pay / Decimal('100')
+                )
+            else:
+                # Fixed value
+                balances[user_id]['balance'] += Decimal(participation_activity.value_to_pay)
+
+            # If the user is the creator of the activity, subtract the total value of the activity from their balance
+            if creator_id == user_id:
+                creator_balance += Decimal(participation_activity.activity.value)
+
+        for user_id, data in balances.items():
+            if user_id != creator_id:
+                data['balance'] -= creator_balance / Decimal(len(balances) - 1)
+
+        balances_list = [{'user_name': data['name'], 'balance': data['balance']}
+                         for user_id, data in balances.items()]
+
+        return Response(balances_list, status=status.HTTP_200_OK)

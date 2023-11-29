@@ -15,5 +15,6 @@ urlpatterns = [
     path('contacts/', ContactsView.as_view(), name='contacts'),
     path("user/", UserDetailView.as_view(), name='user-detail'),
     path("user/<int:user_id>/", UserDetailByIdView.as_view(), name='user-detail-by-id'),
+    path('api/event/<int:event_id>/balances/', EventBalancesView.as_view(), name='event-balances'),
     path("api/", include(router.urls)),
 ]
