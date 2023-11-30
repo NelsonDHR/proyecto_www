@@ -7,7 +7,6 @@ app_name = 'splitcount'
 router = routers.DefaultRouter()
 router.register(r'event', EventView, 'event')
 router.register(r'activities', ActivityView, 'activities')
-#router.register(r'balance', BalanceView, 'balance')
 
 urlpatterns = [
     path('sign-up/', SignUpView.as_view(), name='create-account'),
@@ -17,5 +16,6 @@ urlpatterns = [
     path("user/", UserDetailView.as_view(), name='user-detail'),
     path("user/<int:user_id>/", UserDetailByIdView.as_view(), name='user-detail-by-id'),
     path('balance/<int:event_id>/', BalanceView.as_view()),
+    path('payment/', PaymentView.as_view()),
     path("api/", include(router.urls)),
 ]

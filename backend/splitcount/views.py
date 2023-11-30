@@ -307,8 +307,6 @@ class BalanceView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]
     
     def get(self, request, event_id):
-        user = self.request.user
-        
         # Obtén el evento
         event = Event.objects.get(id=event_id)
         
@@ -339,5 +337,39 @@ class BalanceView(generics.RetrieveAPIView):
                         total += participant.value_to_pay 
                     result[str(user_id)] = {"nickname": name, "total": total}
         
+        def get_payments_for_event(event):
+            #event = Event.objects.get(id=event_id)
+            activities = event.activities.all()
+            payments = []
+            for activity in activities:
+                participants = ParticipationActivity.objects.filter(Q(activity=activity) & Q(is_active=True)).distinct()
+                for participant in participants:
+                    payments_participation = Payment.objects.filter(Q(participation_activity=participant))
+                    if payments_participation.exists():
+                        value = [values.value for values in payments_participation]
+                        payments.append(value)
+            return payments[0]
+        
+        to_subs = sum(get_payments_for_event(event))
+        id = self.request.user.id
+        result[str(id)]["total"] -= to_subs 
         # Devuelve los resultados
         return Response(result)
+
+class PaymentView(generics.RetrieveAPIView):
+    serializer_class = PaymentSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, *args, **kwargs):
+        request_data = request.data.copy()
+        user = self.request.user.id
+        activity_id = request_data["participation_activity"]
+        participation = ParticipationActivity.objects.filter(Q(user_id=user) & Q(activity_id=activity_id))
+        participation_activity=[user.id for user in participation][0]
+        request_data["participation_activity"] = participation_activity
+        serializer = self.get_serializer(data=request_data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        

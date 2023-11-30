@@ -66,3 +66,8 @@ class ActivitySerializer(serializers.ModelSerializer):
     def get_participation_activities(self, obj):
         participation_activities = ParticipationActivity.objects.filter(activity=obj)
         return ParticipationActivitySerializer(participation_activities, many=True).data
+
+class PaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        exclude = ['date']
