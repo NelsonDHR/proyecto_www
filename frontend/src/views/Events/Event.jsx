@@ -1,5 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Image, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, Tag, Text, Wrap, useDisclosure, Button, Heading, useColorMode, useColorModeValue } from '@chakra-ui/react';
+import {
+  Box,
+  Image,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  Tag,
+  Text,
+  Wrap,
+  useDisclosure,
+  Button,
+  Heading,
+  useColorMode,
+  useColorModeValue,
+} from '@chakra-ui/react';
 import UpdateEventModal from "./UpdateEventModal";
 import DeleteEventModal from "./DeleteEventModal";
 import foodImage from "../../assets/events/food.png";
@@ -8,6 +25,7 @@ import homeImage from "../../assets/events/home.png";
 import coupleImage from "../../assets/events/couple.png";
 import otherImage from "../../assets/events/other.png";
 import { getUser, getUserById } from '../../api/profile.api';
+import { getBalances } from '../../api/event.api';
 
 const Event = ({ data, index, refreshEvents, deleteEvents, contacts, handleActivitiesClick }) => {
   const { colorMode } = useColorMode();
@@ -16,11 +34,12 @@ const Event = ({ data, index, refreshEvents, deleteEvents, contacts, handleActiv
   const modalBgColor = useColorModeValue('white', 'gray.800');
   const [creatorName, setCreatorName] = useState('');
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [balances, setBalances] = useState([]);
 
   useEffect(() => {
     getUserById(data.creator)
       .then((response) => {
-        setCreatorName(response.data.nickname); // o el campo que contenga el nombre o apodo
+        setCreatorName(response.data.nickname);
       })
       .catch((error) => {
         console.error('Error fetching user details:', error);
@@ -36,6 +55,28 @@ const Event = ({ data, index, refreshEvents, deleteEvents, contacts, handleActiv
         console.error('Error fetching current user details:', error);
       });
   }, []);
+
+  useEffect(() => {
+    loadBalances()
+      .then((response) => {
+        setBalances(response);
+        console.log(balances);
+      })
+      .catch((error) => {
+        console.error('Error fetching balances', error);
+      });
+  }, []);
+
+  const loadBalances = async () => {
+    try {
+      const response = await getBalances(data.id);
+      console.log(response);
+      return response.data; // Assuming the response has a 'data' property containing the balances
+    } catch (error) {
+      console.error("Error", error);
+      return []; // Return an empty array in case of an error
+    }
+  };
 
   const images = {
     'travel.png': travelImage,
@@ -91,7 +132,7 @@ const Event = ({ data, index, refreshEvents, deleteEvents, contacts, handleActiv
         </Box>
       </Box>
 
-      <Modal isOpen={isOpen} onClose={onClose} >
+      <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent maxH="500px">
           <ModalHeader fontSize="lg">{data.name}</ModalHeader>
@@ -132,7 +173,7 @@ const Event = ({ data, index, refreshEvents, deleteEvents, contacts, handleActiv
               borderRadius: '24px',
             },
             '&::-webkit-scrollbar-thumb:hover': {
-              background: '#888', // Cambia esto al color que prefieras
+              background: '#888',
             },
           }}>
             <Box
@@ -164,6 +205,27 @@ const Event = ({ data, index, refreshEvents, deleteEvents, contacts, handleActiv
                   <Tag key={index} size="sm" colorScheme="green">{participant.nickname}</Tag>
                 ))}
               </Wrap>
+            </Box>
+            {/* New section to display balances */}
+            <Box mb={4}>
+              <Heading size="sm">Balances</Heading>
+              {balances.map((balance, index) => (
+                <Box key={index} mb={2} display="flex" alignItems="center">
+                  <Text
+                    size="me"
+                  >
+                    {balance.user_name}: {balance.balance}
+                  </Text>
+                  <Button
+                    size="xs"
+                    colorScheme="blue"
+                    ml="auto"
+                    //funcion que haga algo
+                  >
+                    Pay
+                  </Button>
+                </Box>
+              ))}
             </Box>
             <Box display="flex" justifyContent="space-between" mb={4}>
               <Button size="md" colorScheme="green" onClick={() => handleActivitiesClick(data)}>

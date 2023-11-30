@@ -1,3 +1,4 @@
+from decimal import Decimal
 from rest_framework import status, viewsets, generics
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
