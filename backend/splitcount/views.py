@@ -338,22 +338,20 @@ class BalanceView(generics.RetrieveAPIView):
                         total += participant.value_to_pay 
                     result[str(user_id)] = {"nickname": name, "total": total}
         
-        def get_payments_for_event(event):
-            #event = Event.objects.get(id=event_id)
+        def get_payments_for_event(event,result):
             activities = event.activities.all()
-            payments = []
             for activity in activities:
                 participants = ParticipationActivity.objects.filter(Q(activity=activity) & Q(is_active=True)).distinct()
                 for participant in participants:
+                    payments = []
+                    id = participant.user_id
                     payments_participation = Payment.objects.filter(Q(participation_activity=participant))
                     if payments_participation.exists():
                         value = [values.value for values in payments_participation]
                         payments.append(value)
-            return payments[0]
-        
-        to_subs = sum(get_payments_for_event(event))
-        id = self.request.user.id
-        result[str(id)]["total"] -= to_subs 
+                        result[str(id)]["total"] -= sum(payments[0])
+            
+        get_payments_for_event(event,result)
         # Devuelve los resultados
         return Response(result)
 
