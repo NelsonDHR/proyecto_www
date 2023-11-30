@@ -32,7 +32,4 @@ export const getEventParticipants = (id_event) => {
   return axios.get(urlId, getConfig());
 };
 
-export const getBalances = (id_event) => {
-  const urlId = `${url}${id_event}/balances/`;
-  return axios.get(urlId, getConfig());
-};
+

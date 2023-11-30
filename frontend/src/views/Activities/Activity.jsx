@@ -9,6 +9,7 @@ import shopping from "../../assets/activities/shopping.jpg";
 import tickets from "../../assets/activities/tickets.jpg";
 import transportation from "../../assets/activities/transportation.jpg";
 import { getUser, getUserById } from '../../api/profile.api';
+import ActivityPay from './ActivityPay';
 
 const Activity = ({ data, index, refreshActivities, deleteActivities, contacts }) => {
   const { colorMode } = useColorMode();
@@ -17,6 +18,7 @@ const Activity = ({ data, index, refreshActivities, deleteActivities, contacts }
   const modalBgColor = useColorModeValue('white', 'gray.800');
   const [creatorName, setCreatorName] = useState('');
   const [currentUserId, setCurrentUserId] = useState(null);
+
 
   console.log("activity", data.participation_activities)
 
@@ -172,13 +174,21 @@ const Activity = ({ data, index, refreshActivities, deleteActivities, contacts }
               </Wrap>
             </Box>
             <Box display="flex" justifyContent="space-between" mb={4}>
-              <Box display="flex">
+              <Box>
+                <UpdateActivityModal
+                  isOpen={isOpen}
+                  onClose={onClose}
+                  refreshActivities={refreshActivities}
+                  contacts={contacts}
+                  activity={data}
+                  index={index}
+                />
+              </Box>
+              <Box display="flex" alignItems="flex-end">
                 <Box mr={4}>
-                  <UpdateActivityModal
+                  <ActivityPay
                     isOpen={isOpen}
                     onClose={onClose}
-                    refreshActivities={refreshActivities}
-                    contacts={contacts}
                     activity={data}
                     index={index}
                   />
@@ -193,7 +203,7 @@ const Activity = ({ data, index, refreshActivities, deleteActivities, contacts }
                   />
                 </Box>
               </Box>
-            </Box>
+            </Box>  
           </ModalBody>
         </ModalContent>
       </Modal>

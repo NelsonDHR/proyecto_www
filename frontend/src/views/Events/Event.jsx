@@ -25,7 +25,7 @@ import homeImage from "../../assets/events/home.png";
 import coupleImage from "../../assets/events/couple.png";
 import otherImage from "../../assets/events/other.png";
 import { getUser, getUserById } from '../../api/profile.api';
-import { getBalances } from '../../api/event.api';
+import { getBalances } from '../../api/balances.api';
 
 const Event = ({ data, index, refreshEvents, deleteEvents, contacts, handleActivitiesClick }) => {
   const { colorMode } = useColorMode();
@@ -56,27 +56,30 @@ const Event = ({ data, index, refreshEvents, deleteEvents, contacts, handleActiv
       });
   }, []);
 
+  const loadBalances = async () => {
+    try {
+      const response = await getBalances(data.id);
+      // Convertir el objeto en un array
+      const balancesArray = Object.entries(response.data).map(([key, value]) => value);
+      return balancesArray
+    } catch (error) {
+      console.error("Error fetching balances", error);// Set balances to an empty array in case of an error
+    }
+  };
+
   useEffect(() => {
     loadBalances()
       .then((response) => {
+
         setBalances(response);
-        console.log(balances);
+
       })
       .catch((error) => {
         console.error('Error fetching balances', error);
       });
   }, []);
 
-  const loadBalances = async () => {
-    try {
-      const response = await getBalances(data.id);
-      console.log(response);
-      return response.data; // Assuming the response has a 'data' property containing the balances
-    } catch (error) {
-      console.error("Error", error);
-      return []; // Return an empty array in case of an error
-    }
-  };
+
 
   const images = {
     'travel.png': travelImage,
@@ -206,7 +209,6 @@ const Event = ({ data, index, refreshEvents, deleteEvents, contacts, handleActiv
                 ))}
               </Wrap>
             </Box>
-            {/* New section to display balances */}
             <Box mb={4}>
               <Heading size="sm">Balances</Heading>
               {balances.map((balance, index) => (
@@ -214,16 +216,16 @@ const Event = ({ data, index, refreshEvents, deleteEvents, contacts, handleActiv
                   <Text
                     size="me"
                   >
-                    {balance.user_name}: {balance.balance}
+                    {balance.nickname}: {balance.total}
                   </Text>
-                  <Button
+                  {/* <Button
                     size="xs"
                     colorScheme="blue"
                     ml="auto"
                     //funcion que haga algo
                   >
                     Pay
-                  </Button>
+                  </Button> */}
                 </Box>
               ))}
             </Box>
