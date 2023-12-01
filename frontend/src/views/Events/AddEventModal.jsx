@@ -11,6 +11,7 @@ import {
   Button,
   FormControl,
   FormLabel,
+  FormErrorMessage,
   Input,
   Select,
   Text,
@@ -33,6 +34,7 @@ import { getUser } from '../../api/profile.api';
 const AddEventModal = ({ updateEvents, ...props }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [contacts, setContacts] = useState([]);
+  const [formErrors, setFormErrors] = useState({});
   const [isHovered, setIsHovered] = useState(false);
   const [eventData, setEventData] = useState({
     description: "",
@@ -63,9 +65,13 @@ const AddEventModal = ({ updateEvents, ...props }) => {
   };
 
   // Handle Functions
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+    setFormErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: "",
+    }));
     if (name === "event_type") {
       setEventData({
         ...eventData,
@@ -98,6 +104,15 @@ const AddEventModal = ({ updateEvents, ...props }) => {
   };
 
   const handleSubmit = async () => {
+    let errors = {};
+    if (!eventData.name) errors.name = "Name is required";
+    if (!eventData.description) errors.description = "Description is required";
+    if (!eventData.event_type) errors.event_type = "Event type is required";
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
     try {
       const newEvent = await createEvent(eventData);
       console.log("Evento creado:", newEvent)
@@ -131,7 +146,7 @@ const AddEventModal = ({ updateEvents, ...props }) => {
         position="fixed"
         bottom="2rem"
         right="2rem"
-        style={{ zIndex: 9999 }}  
+        style={{ zIndex: 9999 }}
         colorScheme="teal"
         size="lg"
         borderRadius="full"
@@ -174,7 +189,7 @@ const AddEventModal = ({ updateEvents, ...props }) => {
               },
             }}
           >
-            <FormControl mb={4}>
+            <FormControl mb={4} isInvalid={!!formErrors.name}>
               <FormLabel>Name of the event</FormLabel>
               <Input
                 type="text"
@@ -182,8 +197,9 @@ const AddEventModal = ({ updateEvents, ...props }) => {
                 value={eventData.name}
                 onChange={handleChange}
               />
+              {formErrors.name && <FormErrorMessage>{formErrors.name}</FormErrorMessage>}
             </FormControl>
-            <FormControl mb={4}>
+            <FormControl mb={4} isInvalid={!!formErrors.description}>
               <FormLabel>Description of the event</FormLabel>
               <Input
                 type="text"
@@ -191,8 +207,9 @@ const AddEventModal = ({ updateEvents, ...props }) => {
                 value={eventData.description}
                 onChange={handleChange}
               />
+              {formErrors.description && <FormErrorMessage>{formErrors.description}</FormErrorMessage>}
             </FormControl>
-            <FormControl mb={4}>
+            <FormControl mb={4} isInvalid={!!formErrors.event_type}>
               <FormLabel>Type of event</FormLabel>
               <Select
                 name="event_type"
@@ -206,6 +223,7 @@ const AddEventModal = ({ updateEvents, ...props }) => {
                 <option value="FD">Food</option>
                 <option value="OT">Other</option>
               </Select>
+              {formErrors.event_type && <FormErrorMessage>{formErrors.event_type}</FormErrorMessage>}
             </FormControl>
             <FormControl mb={4}>
               <FormLabel>Participants</FormLabel>

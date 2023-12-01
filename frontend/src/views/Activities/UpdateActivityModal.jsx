@@ -6,6 +6,7 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  FormErrorMessage,
   Input,
   Modal,
   ModalBody,
@@ -44,12 +45,13 @@ const UpdateActivityModal = ({ refreshActivities, activity, contacts, ...props }
   );
   const [paymentType, setPaymentType] = useState(activity.payment_type);
   const [isAdvanced, setIsAdvanced] = useState(!activity.is_equitable);
+  const [formErrors, setFormErrors] = useState({});
   const [activityData, setActivityData] = useState({
     event: activity.event,
     name: activity.name,
     description: activity.description,
     image: null,
-    image_name: "",
+    image_name: activity.image_name,
     value: activity.value,
     payment_type: activity.payment_type,
     is_equitable: activity.is_equitable,
@@ -67,6 +69,10 @@ const UpdateActivityModal = ({ refreshActivities, activity, contacts, ...props }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    setFormErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: "",
+    }));
     setActivityData({
       ...activityData,
       [name]: value,
@@ -91,6 +97,27 @@ const UpdateActivityModal = ({ refreshActivities, activity, contacts, ...props }
 
   const handleCostChange = (id, value) => {
     if (isAdvanced) {
+      const totalValue = Object.values(editedValues).reduce((total, val) => total + Number(val), 0) - (editedValues[id] || 0) + Number(value);
+      console.log("x", totalValue)
+
+      if ((paymentType === 'FV' && totalValue > activityData.value) || (paymentType === 'PR' && totalValue > 100)) {
+        setFormErrors((prevErrors) => ({
+          ...prevErrors,
+          value: paymentType === 'FV' ? "The sum of all participant values cannot exceed the activity value" : "The sum of all percentages cannot exceed 100% and each percentage must be between 0 and 100",
+        }));
+        return;
+      } else if (totalValue <= (paymentType === 'FV' ? activityData.value : 100)) {
+        setFormErrors((prevErrors) => ({
+          ...prevErrors,
+          value: "",
+        }));
+      }
+
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        [id]: "",
+      }));
+
       setEditedValues(prev => ({ ...prev, [id]: value }));
     }
   };
@@ -132,6 +159,11 @@ const UpdateActivityModal = ({ refreshActivities, activity, contacts, ...props }
       };
 
       const selectedCount = Object.values(updatedParticipants).filter(p => p.isSelected).length;
+      if (selectedCount === 0) {
+        updatedParticipants[participantId].isSelected = true;
+        return updatedParticipants;
+      }
+
       const costOrPercentagePerParticipant = paymentType === 'FV' ? activityData.value / selectedCount : 100 / selectedCount;
 
       for (const id in updatedParticipants) {
@@ -147,6 +179,33 @@ const UpdateActivityModal = ({ refreshActivities, activity, contacts, ...props }
   };
 
   const handleSubmit = async () => {
+    let errors = {};
+    if (!activityData.name) errors.name = "Name is required";
+    if (!activityData.description) errors.description = "Description is required";
+    if (!activityData.value) errors.value = "Value of the activity is required";
+
+    if (isAdvanced) {
+      const totalValue = Object.values(editedValues).reduce((total, val) => total + Number(val), 0);
+      if ((paymentType === 'FV' && totalValue != activityData.value) || (paymentType === 'PR' && totalValue < 99)) {
+        errors.value = paymentType === 'FV' ? "The sum of all participant values must equal the activity value" : "The sum of all percentages must equal 100%";
+      }
+
+      const selectedParticipantIds = Object.entries(selectedParticipants)
+        .filter(([id, participant]) => participant.isSelected)
+        .map(([id]) => id);
+
+      for (const id of selectedParticipantIds) {
+        if (!editedValues[id]) {
+          errors[id] = "Is required";
+        }
+      }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
     try {
       const participants = Object.entries(selectedParticipants)
         .filter(([id, participant]) => participant.isSelected)
@@ -163,14 +222,14 @@ const UpdateActivityModal = ({ refreshActivities, activity, contacts, ...props }
             };
           }
         });
-  
+
       const updatedActivityData = {
         ...activityData,
         payment_type: paymentType,
         is_equitable: !isAdvanced,
         participants,
       };
-  
+
       const updatedActivity = await putActivity(activity.id, updatedActivityData);
       refreshActivities(updatedActivity.data, props.index);
       onClose();
@@ -210,7 +269,7 @@ const UpdateActivityModal = ({ refreshActivities, activity, contacts, ...props }
             }}
           >
 
-            <FormControl mb={4}>
+            <FormControl mb={4} isInvalid={!!formErrors.name}>
               <FormLabel>Name of the activity</FormLabel>
               <Input
                 type="text"
@@ -218,10 +277,10 @@ const UpdateActivityModal = ({ refreshActivities, activity, contacts, ...props }
                 value={activityData.name}
                 onChange={handleChange}
               />
-
+              {formErrors.name && <FormErrorMessage>{formErrors.name}</FormErrorMessage>}
             </FormControl>
 
-            <FormControl mb={4}>
+            <FormControl mb={4} isInvalid={!!formErrors.description}>
               <FormLabel>Activity description</FormLabel>
               <Input
                 type="text"
@@ -229,9 +288,10 @@ const UpdateActivityModal = ({ refreshActivities, activity, contacts, ...props }
                 value={activityData.description}
                 onChange={handleChange}
               />
+              {formErrors.description && <FormErrorMessage>{formErrors.description}</FormErrorMessage>}
             </FormControl>
 
-            <FormControl mb={4}>
+            <FormControl mb={4} isInvalid={!!formErrors.value}>
               <FormLabel>Value of the activity</FormLabel>
               <Input
                 type="number"
@@ -239,6 +299,7 @@ const UpdateActivityModal = ({ refreshActivities, activity, contacts, ...props }
                 value={activityData.value}
                 onChange={handleChange}
               />
+              {formErrors.value && <FormErrorMessage>{formErrors.value}</FormErrorMessage>}
             </FormControl>
 
             <FormControl mb={4}>
@@ -255,7 +316,7 @@ const UpdateActivityModal = ({ refreshActivities, activity, contacts, ...props }
               <Flex justify="space-between" align="center" mb={4}>
                 <FormLabel>Participants</FormLabel>
                 <HStack spacing="24px">
-                  <Switch isChecked={isAdvanced} onChange={(e) => setIsAdvanced(e.target.checked)} />
+                  <Switch isChecked={isAdvanced} onChange={(e) => setIsAdvanced(e.target.checked)} disabled={!activityData.value} />
                   <FormLabel>Advanced</FormLabel>
                 </HStack>
               </Flex>
@@ -275,6 +336,7 @@ const UpdateActivityModal = ({ refreshActivities, activity, contacts, ...props }
                     onChange={(e) => handleCostChange(participant.user.id, e.target.value)}
                     disabled={!isAdvanced || !selectedParticipants[participant.user.id]?.isSelected}
                     width="150px"
+                    isInvalid={!!formErrors[participant.user.id]}
                   />
                 </Flex>
               ))}

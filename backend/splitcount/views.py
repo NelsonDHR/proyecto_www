@@ -9,6 +9,7 @@ from .models import *
 from .serializers import *
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class SignUpView(generics.CreateAPIView):
@@ -40,21 +41,25 @@ class ContactsView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = ContactSerializer(data=request.data)
         if serializer.is_valid():
-            contact = User.objects.get(
-                email=serializer.validated_data['email'])
-            request.user.contacts.add(contact)
-            contact.contacts.add(request.user)
-            return Response(status=status.HTTP_200_OK)
+            try:
+                contact = User.objects.get(email=serializer.validated_data['email'])
+                request.user.contacts.add(contact)
+                contact.contacts.add(request.user)
+                return Response(status=status.HTTP_200_OK)
+            except ObjectDoesNotExist:
+                return Response({"detail": "Contact not found"}, status=status.HTTP_404_NOT_FOUND)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, *args, **kwargs):
         serializer = ContactSerializer(data=request.data)
         if serializer.is_valid():
-            contact = User.objects.get(
-                email=serializer.validated_data['email'])
-            request.user.contacts.remove(contact)
-            return Response(status=status.HTTP_200_OK)
+            try:
+                contact = User.objects.get(email=serializer.validated_data['email'])
+                request.user.contacts.remove(contact)
+                return Response(status=status.HTTP_200_OK)
+            except ObjectDoesNotExist:
+                return Response({"detail": "Contact not found"}, status=status.HTTP_404_NOT_FOUND)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -123,16 +128,21 @@ class EventView(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
+
+        # Verifica si el evento tiene actividades asociadas
+        if instance.activities.all().exists():
+            return Response({"error": "Can't update the event because it has activities."}, status=status.HTTP_400_BAD_REQUEST)
+
         request_data = request.data.copy()
         participants_data = request_data.pop('participants', [])
 
-        # Update activity details
+        # Actualiza los detalles del evento
         serializer = self.get_serializer(
             instance, data=request_data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        # Update participants
+        # Actualiza los participantes
         instance.participants.clear()
         for participant_id in participants_data:
             try:
@@ -141,12 +151,6 @@ class EventView(viewsets.ModelViewSet):
                     user=participant, event=instance, is_active=True)
             except User.DoesNotExist:
                 pass
-
-        # Update participants in all activities associated with this event
-        for activity in instance.activities.all():
-            activity.participants.set(instance.participants.filter(
-                participation_events__is_active=True))
-            activity.save()
 
         return Response(serializer.data)
 
@@ -303,6 +307,7 @@ class UserDetailByIdView(generics.RetrieveAPIView):
     def get_object(self):
         user_id = self.kwargs['user_id']
         return get_object_or_404(User, id=user_id)
+    
 
 class BalanceView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]

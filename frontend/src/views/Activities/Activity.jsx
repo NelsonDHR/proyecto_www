@@ -19,8 +19,7 @@ const Activity = ({ data, index, refreshActivities, deleteActivities, contacts }
   const [creatorName, setCreatorName] = useState('');
   const [currentUserId, setCurrentUserId] = useState(null);
 
-
-  console.log("activity", data.participation_activities)
+  console.log("activity", data)
 
   useEffect(() => {
     getUserById(data.creator)
@@ -158,7 +157,7 @@ const Activity = ({ data, index, refreshActivities, deleteActivities, contacts }
               <Text fontSize="sm">{data.description}</Text>
             </Box>
             <Box mb={4}>
-              <Heading size="sm">Value activity</Heading>
+              <Heading size="sm">Value of the activity</Heading>
               <Text fontSize="sm">{data.value}</Text>
             </Box>
             <Box mb={4}>

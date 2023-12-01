@@ -47,6 +47,7 @@ class Activity(models.Model):
     image_name = models.CharField(max_length=255, null=True, blank=True)
     name = models.CharField(max_length=255)
     description = models.TextField()
+    date = models.DateTimeField()
     value = models.DecimalField(max_digits=12, decimal_places=2)
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='activities')
     participants = models.ManyToManyField(User, through='ParticipationActivity', related_name='activities')

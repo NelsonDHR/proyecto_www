@@ -43,7 +43,6 @@ const ActivityPay = ({activity}) => {
     }
   };
   
-
   return (
     <>
     <Button colorScheme="teal" onClick={onOpen}>Pay</Button>
@@ -56,7 +55,7 @@ const ActivityPay = ({activity}) => {
           <form>
             <label>
               Amount:
-              <Input
+              <Input mt={2}
                 type="number"
                 name="value"
                 onChange={handleChange}

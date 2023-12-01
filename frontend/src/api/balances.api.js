@@ -1,8 +1,7 @@
 import axios from "axios";
 
-const url = import.meta.env.VITE_BACKEND_URL_LOCAL + "/splitcount/balance/";
-//const url = import.meta.env.VITE_BACKEND_URL_PROD + "/splitcount/balance/";
-
+// const url = import.meta.env.VITE_BACKEND_URL_LOCAL + "/splitcount/balance/";
+const url = import.meta.env.VITE_BACKEND_URL_PROD + "/splitcount/balance/";
 
 const getConfig = () => ({
     headers: {

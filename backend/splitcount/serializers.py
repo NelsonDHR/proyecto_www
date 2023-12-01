@@ -34,7 +34,7 @@ class EventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Event
-        exclude = ['date']  # Excluye 'date' durante la creación
+        exclude = ['date']
 
     def create(self, validated_data):
         validated_data['date'] = timezone.now()
@@ -61,7 +61,18 @@ class ActivitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Activity
-        fields = '__all__'
+        exclude = ['date']
+
+    def create(self, validated_data):
+        validated_data['date'] = timezone.now()
+        activity = Activity(**validated_data)
+        activity.save()
+        return activity
+    
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['date'] = instance.date  # Incluye 'date' cuando se obtienen los eventos
+        return representation
 
     def get_participation_activities(self, obj):
         participation_activities = ParticipationActivity.objects.filter(activity=obj)

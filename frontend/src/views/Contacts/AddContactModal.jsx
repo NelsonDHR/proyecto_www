@@ -5,6 +5,7 @@ import {
   Button,
   FormControl,
   FormLabel,
+  FormErrorMessage,
   Input,
   Icon,
   Modal,
@@ -23,7 +24,9 @@ import { getUser } from '../../api/profile.api';
 const AddContactModal = ({ updateContacts, ...props }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
   const [currentUserEmail, setCurrentUserEmail] = useState(null);
+  const [isHovered, setIsHovered] = useState(false);
   const toast = useToast();
 
   useEffect(() => {
@@ -38,9 +41,15 @@ const AddContactModal = ({ updateContacts, ...props }) => {
 
   const handleChange = (e) => {
     setEmail(e.target.value);
-  };
+    setEmailError("");
+  };  
 
   const handleSubmit = async () => {
+    if (!email) {
+      setEmailError("Email is required!");
+      return;
+    }
+
     if (email === currentUserEmail) {
       toast({
         title: "Error at adding the contact.",
@@ -75,11 +84,18 @@ const AddContactModal = ({ updateContacts, ...props }) => {
       });
       onClose();
     } catch (error) {
+      toast({
+        title: "Error at adding the contact.",
+        description: "Check again if the email exists!",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
       console.error("Error al agregar el contacto:", error);
     }
   };
 
-  const [isHovered, setIsHovered] = useState(false);
+
 
   return (
     <>
@@ -115,7 +131,7 @@ const AddContactModal = ({ updateContacts, ...props }) => {
           <ModalHeader pb={4}>Add Contact</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <FormControl mb={4}>
+            <FormControl mb={4} isInvalid={!!emailError}>
               <FormLabel>Contact's email</FormLabel>
               <Input
                 type="email"
@@ -123,6 +139,7 @@ const AddContactModal = ({ updateContacts, ...props }) => {
                 value={email}
                 onChange={handleChange}
               />
+              {emailError && <FormErrorMessage>{emailError}</FormErrorMessage>}
             </FormControl>
           </ModalBody>
           <ModalFooter>

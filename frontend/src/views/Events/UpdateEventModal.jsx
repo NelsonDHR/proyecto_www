@@ -10,6 +10,7 @@ import {
   ModalBody,
   FormControl,
   FormLabel,
+  FormErrorMessage,
   Input,
   Select,
   ModalFooter,
@@ -23,6 +24,7 @@ import {
   Center,
   Wrap,
   WrapItem,
+  useToast,
 } from "@chakra-ui/react";
 import { putEvent } from "../../api/event.api";
 
@@ -40,9 +42,11 @@ const UpdateEventModal = ({ refreshEvents, event, contacts, updateEvents, ...pro
 
   const [participants, setParticipants] = useState(event.participants);
   const [allParticipants, setAllParticipants] = useState([]);
+  const [formErrors, setFormErrors] = useState({});
+  const toast = useToast();
 
   useEffect(() => {
-    
+
     setParticipants(event.participants);
 
     const combinedList = [...contacts, ...event.participants];
@@ -56,6 +60,10 @@ const UpdateEventModal = ({ refreshEvents, event, contacts, updateEvents, ...pro
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    setFormErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: "",
+    }));
     setEventData({
       ...eventData,
       [name]: value,
@@ -80,6 +88,14 @@ const UpdateEventModal = ({ refreshEvents, event, contacts, updateEvents, ...pro
   };
 
   const handleSubmit = async () => {
+    let errors = {};
+    if (!eventData.name) errors.name = "Name is required";
+    if (!eventData.description) errors.description = "Description is required";
+    if (!eventData.event_type) errors.event_type = "Event type is required";
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
     try {
       const newEvent = await putEvent(event.id, eventData);
       refreshEvents(newEvent.data, props.index);
@@ -87,6 +103,15 @@ const UpdateEventModal = ({ refreshEvents, event, contacts, updateEvents, ...pro
       onClose();
     } catch (error) {
       console.error("Error al actualizar el evento:", error);
+      if (error.response && error.response.data.error === "Can't update the event because it has activities.") {
+        toast({
+          title: "Error updating the event",
+          description: "You can't update an event that has activities!",
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
+      }
     }
   };
 
@@ -99,7 +124,7 @@ const UpdateEventModal = ({ refreshEvents, event, contacts, updateEvents, ...pro
           <ModalHeader pb={4}>Edit Event</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <FormControl mb={4}>
+            <FormControl mb={4} isInvalid={!!formErrors.name}>
               <FormLabel>Name of the event</FormLabel>
               <Input
                 type="text"
@@ -107,8 +132,9 @@ const UpdateEventModal = ({ refreshEvents, event, contacts, updateEvents, ...pro
                 value={eventData.name}
                 onChange={handleChange}
               />
+              {formErrors.name && <FormErrorMessage>{formErrors.name}</FormErrorMessage>}
             </FormControl>
-            <FormControl mb={4}>
+            <FormControl mb={4} isInvalid={!!formErrors.description}>
               <FormLabel>Description of the event</FormLabel>
               <Input
                 type="text"
@@ -116,8 +142,9 @@ const UpdateEventModal = ({ refreshEvents, event, contacts, updateEvents, ...pro
                 value={eventData.description}
                 onChange={handleChange}
               />
+              {formErrors.description && <FormErrorMessage>{formErrors.description}</FormErrorMessage>}
             </FormControl>
-            <FormControl mb={4}>
+            <FormControl mb={4} isInvalid={!!formErrors.event_type}>
               <FormLabel>Type of event</FormLabel>
               <Select
                 name="event_type"
@@ -131,6 +158,7 @@ const UpdateEventModal = ({ refreshEvents, event, contacts, updateEvents, ...pro
                 <option value="FD">Food</option>
                 <option value="OT">Other</option>
               </Select>
+              {formErrors.event_type && <FormErrorMessage>{formErrors.event_type}</FormErrorMessage>}
             </FormControl>
             <FormControl mb={4}>
               <FormLabel>Participants</FormLabel>

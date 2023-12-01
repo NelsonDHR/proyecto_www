@@ -61,7 +61,9 @@ const LogIn = () => {
     } catch (error) {
       setIsSuccess(false);
       let errorMessage = '';
-      if (error.response.data.email) {
+      if (error.code === 'ERR_NETWORK') {
+        errorMessage = 'Connection error with the server. Please try again later!';
+      } else if (error.response.data.email) {
         errorMessage = error.response.data.email[0];
       } else if (error.response.data.non_field_errors) {
         errorMessage = error.response.data.non_field_errors[0];

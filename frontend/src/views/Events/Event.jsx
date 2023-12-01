@@ -212,20 +212,12 @@ const Event = ({ data, index, refreshEvents, deleteEvents, contacts, handleActiv
             <Box mb={4}>
               <Heading size="sm">Balances</Heading>
               {balances.map((balance, index) => (
-                <Box key={index} mb={2} display="flex" alignItems="center">
+                <Box key={index} mt={2} display="flex" alignItems="center">
                   <Text
                     size="me"
                   >
-                    {balance.nickname}: {balance.total}
+                    {balance.nickname}: {balance.total == 0 ? balance.total : '$ -'}{Math.abs(balance.total).toFixed(2)}
                   </Text>
-                  {/* <Button
-                    size="xs"
-                    colorScheme="blue"
-                    ml="auto"
-                    //funcion que haga algo
-                  >
-                    Pay
-                  </Button> */}
                 </Box>
               ))}
             </Box>
