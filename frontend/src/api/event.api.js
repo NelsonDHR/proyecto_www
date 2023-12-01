@@ -31,3 +31,5 @@ export const getEventParticipants = (id_event) => {
   const urlId = `${url}${id_event}/participants/`;
   return axios.get(urlId, getConfig());
 };
+
+

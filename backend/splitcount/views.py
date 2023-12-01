@@ -1,3 +1,4 @@
+from decimal import Decimal
 from rest_framework import status, viewsets, generics
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
@@ -169,10 +170,10 @@ class ActivityView(viewsets.ModelViewSet):
 
         if event_id is not None:
             queryset = Activity.objects.filter(
-                (Q(event=event_id) & Q(is_active=True)) | Q(id=activity_id)).distinct()
+                (Q(event=event_id) & Q(is_active=True)) & Q(participants=user)| Q(id=activity_id)).distinct()
         else:
             queryset = Activity.objects.filter(
-                (Q(creator=user) | Q(participants=user)) & Q(is_active=True)).distinct()
+                (Q(creator=user) & Q(participants=user)| Q(participants=user)) & Q(is_active=True)).distinct()
 
         return queryset
 
@@ -302,3 +303,72 @@ class UserDetailByIdView(generics.RetrieveAPIView):
     def get_object(self):
         user_id = self.kwargs['user_id']
         return get_object_or_404(User, id=user_id)
+
+class BalanceView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, event_id):
+        # Obtén el evento
+        event = Event.objects.get(id=event_id)
+        
+        # Obtén las actividades relacionadas con el evento
+        activities = Activity.objects.filter(Q(event=event) & Q(is_active=True))
+        
+        result = {}
+        for activity in activities:
+            # Obtén las ParticipationActivity relacionadas con la actividad
+            participants = ParticipationActivity.objects.filter(Q(activity=activity) & Q(is_active=True)).distinct()
+            name = "" 
+            for participant in participants:
+                total = 0
+                user = User.objects.filter(Q(id=participant.user_id))
+                name = [name.nickname for name in user][0]
+                user_id = [id.id for id in user][0]
+                if str(user_id) in result:
+                    if activity.payment_type == "PR":
+                        value_activity = activity.value
+                        result[str(user_id)]["total"] += value_activity*participant.percentage_to_pay/100
+                    else:
+                        result[str(user_id)]["total"] += participant.value_to_pay 
+                else: 
+                    if activity.payment_type == "PR":
+                        value_activity = activity.value
+                        total += value_activity*participant.percentage_to_pay/100
+                    else:
+                        total += participant.value_to_pay 
+                    result[str(user_id)] = {"nickname": name, "total": total}
+        
+        def get_payments_for_event(event,result):
+            activities = event.activities.all()
+            for activity in activities:
+                participants = ParticipationActivity.objects.filter(Q(activity=activity) & Q(is_active=True)).distinct()
+                for participant in participants:
+                    payments = []
+                    id = participant.user_id
+                    payments_participation = Payment.objects.filter(Q(participation_activity=participant))
+                    if payments_participation.exists():
+                        value = [values.value for values in payments_participation]
+                        payments.append(value)
+                        result[str(id)]["total"] -= sum(payments[0])
+            
+        get_payments_for_event(event,result)
+        # Devuelve los resultados
+        return Response(result)
+
+class PaymentView(generics.RetrieveAPIView):
+    serializer_class = PaymentSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, *args, **kwargs):
+        request_data = request.data.copy()
+        user = self.request.user.id
+        activity_id = request_data["participation_activity"]
+        participation = ParticipationActivity.objects.filter(Q(user_id=user) & Q(activity_id=activity_id))
+        participation_activity=[user.id for user in participation][0]
+        request_data["participation_activity"] = participation_activity
+        serializer = self.get_serializer(data=request_data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
