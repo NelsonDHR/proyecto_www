@@ -12,6 +12,7 @@ import {
   Spinner,
   Text,
   useColorMode,
+  Center
 } from '@chakra-ui/react';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
@@ -153,6 +154,7 @@ const LogIn = () => {
                     </FormControl>
                   )}
                 </Field>
+                <Center>
                 <Button
                   type="submit"
                   colorScheme="blue"
@@ -161,6 +163,7 @@ const LogIn = () => {
                 >
                   Log In
                 </Button>
+                </Center>
               </Form>
             )}
           </Formik>

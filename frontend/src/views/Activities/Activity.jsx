@@ -158,6 +158,10 @@ const Activity = ({ data, index, refreshActivities, deleteActivities, contacts }
               <Text fontSize="sm">{data.description}</Text>
             </Box>
             <Box mb={4}>
+              <Heading size="sm">Value activity</Heading>
+              <Text fontSize="sm">{data.value}</Text>
+            </Box>
+            <Box mb={4}>
               <Heading size="sm">Created by</Heading>
               <Text fontSize="sm">{creatorName}</Text>
             </Box>
