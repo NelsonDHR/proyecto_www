@@ -8,13 +8,13 @@ import {
 } from '@chakra-ui/react';
 
 import Navbar from '../components/Navbar';
-import Events from './Events/Events';
 import ContactsView from './Contacts/ContactsView';
+import EventsView from './Events/EventsView';
+import ActivitiesView from './Activities/ActivitiesView';
 import Profile from './Profile/Profile';
-import Activities from './Activities/Activities';
+
 
 import { logOut } from "../api/auth.api";
-
 
 const Home = () => {
 
@@ -95,9 +95,10 @@ const Home = () => {
           handleLogOut={handleLogOut}
         />
       )}
-      {!isLoading && selectedOption === 'events' && <Events handleOptionClick={handleOptionClick} handleActivityEvent={handleActivityEvent}/>}      {!isLoading && selectedOption === 'contacts' && <ContactsView />}
+      {!isLoading && selectedOption === 'events' && <EventsView handleOptionClick={handleOptionClick} handleActivityEvent={handleActivityEvent}/>}
+      {!isLoading && selectedOption === 'contacts' && <ContactsView />}
       {!isLoading && selectedOption === 'profile' && <Profile onAccountDeletion={handleAccountDeletion} />}
-      {!isLoading && selectedOption === 'activities' && <Activities event={activityEvent}/>}
+      {!isLoading && selectedOption === 'activities' && <ActivitiesView event={activityEvent}/>}
     </Box>
   );
 };

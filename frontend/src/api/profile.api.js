@@ -13,6 +13,10 @@ export const getUser = () => {
   return axios.get(url, getConfig());
 };
 
+export const getUserById = (id) => {
+  return axios.get(`${url}${id}/`, getConfig());
+};
+
 export const updateUser = (user) => {
   return axios.put(url, user, getConfig());
 };

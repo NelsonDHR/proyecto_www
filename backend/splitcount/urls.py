@@ -14,5 +14,8 @@ urlpatterns = [
     path('log-out/', LogOutView.as_view(), name='log-out'),
     path('contacts/', ContactsView.as_view(), name='contacts'),
     path("user/", UserDetailView.as_view(), name='user-detail'),
+    path("user/<int:user_id>/", UserDetailByIdView.as_view(), name='user-detail-by-id'),
+    path('balance/<int:event_id>/', BalanceView.as_view()),
+    path('payment/', PaymentView.as_view()),
     path("api/", include(router.urls)),
 ]

@@ -22,7 +22,14 @@ export const putEvent = (id_event, event) => {
   return axios.put(urlId, event, getConfig());
 };
 
-export const inactivateEvent = (id_event,event) => {
+export const inactivateEvent = (id_event) => {
   const urlId = `${url}${id_event}/`;
-  return axios.delete(urlId,getConfig());
+  return axios.delete(urlId, getConfig());
 }
+
+export const getEventParticipants = (id_event) => {
+  const urlId = `${url}${id_event}/participants/`;
+  return axios.get(urlId, getConfig());
+};
+
+

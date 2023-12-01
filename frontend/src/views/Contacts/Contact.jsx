@@ -1,20 +1,37 @@
-// Contact.jsx
 import React from 'react';
 import { Box, Avatar, Text, Button, Flex, Spacer, useColorMode, useToast } from '@chakra-ui/react';
 import { DeleteIcon } from '@chakra-ui/icons';
-import { deleteContact } from '../../api/contacts.api'; // Asegúrate de tener esta función en tu API
+import man1 from '../../assets/avatars/man-1.png';
+import man2 from '../../assets/avatars/man-2.png';
+import man3 from '../../assets/avatars/man-3.png';
+import woman1 from '../../assets/avatars/woman-1.png';
+import woman2 from '../../assets/avatars/woman-2.png';
+import woman3 from '../../assets/avatars/woman-3.png';
+import bear from '../../assets/avatars/bear.png';
+import cat from '../../assets/avatars/cat.png';
+import panda from '../../assets/avatars/panda.png';
+import { deleteContact } from '../../api/contacts.api';
 
 const Contact = ({ contact, updateContacts }) => {
-  const colorMode = useColorMode();
+  const { colorMode } = useColorMode();
   const toast = useToast();
+
+  const avatarImages = {
+    'man-1.png': man1,
+    'man-2.png': man2,
+    'man-3.png': man3,
+    'woman-1.png': woman1,
+    'woman-2.png': woman2,
+    'woman-3.png': woman3,
+    'bear.png': bear,
+    'cat.png': cat,
+    'panda.png': panda,
+  };
 
   const handleDelete = async () => {
     try {
-      // Llama a la función de la API para eliminar el contacto
       await deleteContact({ email: contact.email });
-      // Actualiza la lista de contactos en el componente padre
       updateContacts();
-      // Muestra un mensaje de éxito
       toast({
         title: "Contact deleted.",
         description: `You have deleted ${contact.nickname} from your contacts.`,
@@ -24,7 +41,6 @@ const Contact = ({ contact, updateContacts }) => {
       });
     } catch (error) {
       console.error("Error al eliminar el contacto:", error);
-      // Aquí puedes manejar el error, mostrar un mensaje al usuario, etc.
       toast({
         title: "Error at deleting the contact.",
         description: "An error occurred while trying to delete the contact. Please try again.",
@@ -38,7 +54,7 @@ const Contact = ({ contact, updateContacts }) => {
   return (
     <Box borderRadius="lg" overflow="hidden" boxShadow="sm" p={3} mb={1} bg={colorMode === 'light' ? 'white' : 'gray.700'}>
       <Flex alignItems="center">
-        <Avatar src={contact.avatar} />
+        <Avatar src={contact ? avatarImages[contact.avatar_name] : "https://bit.ly/dan-abramov"} />
         <Box ml={4}>
           <Text fontSize="lg" fontWeight="bold">{contact.nickname}</Text>
           <Text fontSize="sm" color="gray.500">{contact.email}</Text>

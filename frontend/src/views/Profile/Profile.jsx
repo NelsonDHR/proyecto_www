@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
+  Avatar,
   Box,
   Button,
   Flex,
@@ -10,12 +11,21 @@ import {
   useColorMode,
   useToast,
 } from "@chakra-ui/react";
-import { useState, useEffect } from "react";
+import man1 from '../../assets/avatars/man-1.png';
+import man2 from '../../assets/avatars/man-2.png';
+import man3 from '../../assets/avatars/man-3.png';
+import woman1 from '../../assets/avatars/woman-1.png';
+import woman2 from '../../assets/avatars/woman-2.png';
+import woman3 from '../../assets/avatars/woman-3.png';
+import bear from '../../assets/avatars/bear.png';
+import cat from '../../assets/avatars/cat.png';
+import panda from '../../assets/avatars/panda.png';
 import { getUser, updateUser, deleteUser } from "../../api/profile.api";
+import UpdateProfileModal from "./UpdateProfileModal";
 import DeleteAccountModal from "./DeleteAccountModal";
 
 const Profile = ({ onAccountDeletion }) => {
-  const colorMode = useColorMode();
+  const { colorMode } = useColorMode();
   const toast = useToast();
 
   const cancelRef = React.useRef();
@@ -28,9 +38,20 @@ const Profile = ({ onAccountDeletion }) => {
     first_name: "",
     last_name: "",
     nickname: "",
-    //password: "password mockup",
   });
   const [dataUser, setDataUser] = useState(defaultData);
+
+  const avatarImages = {
+    'man-1.png': man1,
+    'man-2.png': man2,
+    'man-3.png': man3,
+    'woman-1.png': woman1,
+    'woman-2.png': woman2,
+    'woman-3.png': woman3,
+    'bear.png': bear,
+    'cat.png': cat,
+    'panda.png': panda,
+  };
 
   useEffect(() => {
     async function loadUser() {
@@ -51,14 +72,13 @@ const Profile = ({ onAccountDeletion }) => {
   };
 
   const handleDelete = async () => {
-    // Close confirmation modal
     onClose();
     try {
       const response = await deleteUser();
+      console.log(response.data);
       localStorage.removeItem("token");
       setIsDeleting(true);
-      console.log(response.data);
-      onAccountDeletion(); // Redirect function
+      onAccountDeletion();
     } catch (error) {
       setIsDeleting(false);
       console.error('Error al eliminar la cuenta:', error.response.data);
@@ -70,7 +90,6 @@ const Profile = ({ onAccountDeletion }) => {
   };
 
   const handleUpdate = async () => {
-    // Enviar actualización a la bd, uso de API.
     setIsEditable(false);
     try {
       const response = await updateUser(dataUser);
@@ -100,92 +119,21 @@ const Profile = ({ onAccountDeletion }) => {
   };
 
   return (
-    <Flex direction="column" alignItems="center" justifyContent="flex-start" height="100vh" p={4}>
+    <Flex direction="column" alignItems="center" justifyContent="center" position="relative" height="100vh" p={4}>
+      <Avatar size="2xl" mb={6} src={dataUser ? avatarImages[dataUser.avatar_name] : "https://bit.ly/dan-abramov"} />
       <Heading as="h1" size="lg" mt={2} mb={2}>
         {defaultData.nickname}'s Profile
       </Heading>
-      <Box w="80%" maxW="400px" mb={4}>
-        <FormControl mb={4}>
-          <FormLabel>First name</FormLabel>
-          <Input
-            bg={colorMode === "light" ? "white" : "gray.700"}
-            color={colorMode === "light" ? "gray.800" : "white"}
-            type="text"
-            name="first_name"
-            value={dataUser.first_name}
-            isReadOnly={!isEditable}
-            onChange={handleChange}
-          />
-        </FormControl>
-        <FormControl mb={4}>
-          <FormLabel>Last name</FormLabel>
-          <Input
-            bg={colorMode === "light" ? "white" : "gray.700"}
-            color={colorMode === "light" ? "gray.800" : "white"}
-            type="text"
-            name="last_name"
-            value={dataUser.last_name}
-            isReadOnly={!isEditable}
-            onChange={handleChange}
-          />
-        </FormControl>
-        <FormControl mb={4}>
-          <FormLabel>Email</FormLabel>
-          <Input
-            bg={colorMode === "light" ? "white" : "gray.700"}
-            color={colorMode === "light" ? "gray.800" : "white"}
-            type="text"
-            name="email"
-            value={dataUser.email}
-            isReadOnly={!isEditable}
-            onChange={handleChange}
-          />
-        </FormControl>
-        <FormControl mb={4}>
-          <FormLabel>Nickname</FormLabel>
-          <Input
-            bg={colorMode === "light" ? "white" : "gray.700"}
-            color={colorMode === "light" ? "gray.800" : "white"}
-            type="text"
-            name="nickname"
-            value={dataUser.nickname}
-            isReadOnly={!isEditable}
-            onChange={handleChange}
-          />
-        </FormControl>
-        <FormControl>
-          <FormLabel>Password</FormLabel>
-          <Input
-            bg={colorMode === "light" ? "white" : "gray.700"}
-            color={colorMode === "light" ? "gray.800" : "white"}
-            type="text"
-            name="password"
-            value={dataUser.password}
-            isReadOnly={!isEditable}
-            onChange={handleChange}
-          />
-        </FormControl>
-        {isEditable ? (
-          <Flex mt={6}>
-            <Button mr={2} colorScheme="green" onClick={handleUpdate}>
-              Update
-            </Button>
-            <Button colorScheme="red" onClick={handleCancel}>
-              Cancel
-            </Button>
-          </Flex>
-        ) : (
-          <Flex mt={6}>
-            <Button colorScheme="green" onClick={handleEdit}>
-              Edit Profile
-            </Button>
-            <Button ml={4} colorScheme="red" onClick={() => setIsOpen(true)}>
-              Delete Account
-            </Button>
-            <DeleteAccountModal isOpen={isOpen} onClose={onClose} handleDelete={handleDelete} cancelRef={cancelRef} />
-          </Flex>
-        )}
-      </Box>
+      <Flex mt={6}>
+        <Button colorScheme="green" onClick={handleEdit}>
+          Edit Profile
+        </Button>
+        <Button ml={4} colorScheme="red" onClick={() => setIsOpen(true)}>
+          Delete Account
+        </Button>
+        <DeleteAccountModal isOpen={isOpen} onClose={onClose} handleDelete={handleDelete} cancelRef={cancelRef} />
+        <UpdateProfileModal isOpen={isEditable} onClose={handleCancel} handleUpdate={handleUpdate} dataUser={dataUser} handleChange={handleChange}/>
+      </Flex>
     </Flex>
   );
 };
